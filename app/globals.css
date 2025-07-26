@@ -159,28 +159,27 @@ body {
   opacity: 1;
 }
 
-/* Skill tag animations */
-.skill-tag {
+/* Remove the old skill-tag styles and replace with skill-badge styles */
+
+/* Skill badge styling - static, no hover effects */
+.skill-badge {
   position: relative;
   overflow: hidden;
+  transition: none;
 }
 
-.skill-tag::before {
+.skill-badge::before {
   content: "";
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: radial-gradient(circle, rgba(126, 231, 135, 0.1) 0%, transparent 70%);
-  transition: all 0.3s ease;
-  transform: translate(-50%, -50%);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(126, 231, 135, 0.03) 0%, rgba(169, 112, 255, 0.03) 100%);
+  border-radius: inherit;
 }
 
-.skill-tag:hover::before {
-  width: 200px;
-  height: 200px;
-}
+/* Remove all the old skill-tag hover animations */
 
 /* Smooth scrolling */
 html {

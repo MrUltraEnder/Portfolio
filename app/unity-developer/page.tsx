@@ -194,9 +194,10 @@ export default function UnityDeveloperPage() {
               {skills.map((skill, index) => (
                 <div
                   key={index}
-                  className="skill-tag bg-[#232329]/30 backdrop-blur-sm rounded-xl p-4 text-center border border-[#232329] hover:border-[#7EE787]/50 hover:bg-[#7EE787]/5 transition-all duration-300 group"
+                  className="skill-badge bg-[#232329]/50 backdrop-blur-sm rounded-xl px-4 py-3 text-center border border-[#232329] relative overflow-hidden"
                 >
-                  <span className="text-[#F4F4F5] group-hover:text-[#7EE787] transition-colors">{skill}</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#7EE787]/5 to-[#A970FF]/5 opacity-50"></div>
+                  <span className="relative text-[#F4F4F5] font-medium text-sm">{skill}</span>
                 </div>
               ))}
             </div>
