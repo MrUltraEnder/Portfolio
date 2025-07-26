@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
+import Script from "next/script"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -27,7 +28,10 @@ export default function RootLayout({
         <meta name="theme-color" content="#0e0e10" />
         <meta name="color-scheme" content="dark" />
       </head>
-      <body className={`${inter.className} antialiased`}>{children}</body>
+      <body className={`${inter.className} antialiased`}>
+        {children}
+        <Script src="/translator.js" strategy="afterInteractive" />
+      </body>
     </html>
   )
 }
