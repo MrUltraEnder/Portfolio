@@ -1,9 +1,9 @@
 (function () {
   /**
-   * Simple bilingual translator using Google Cloud Translation API v2.
+   * Simple bilingual translator using internal API endpoint.
    * All visible text is collected and translated on demand.
    */
-  const API_URL = 'https://translation.googleapis.com/language/translate/v2?key=AIzaSyC0YXtlxqfaRYg5PWTmQfgfXwDJwZBWpuw';
+  const API_URL = '/api/translate';
   const textNodes = [];
   let currentLang = 'en';
   let translations = [];
@@ -27,7 +27,7 @@
     }
   }
 
-  // Call Google Translate API to translate texts to Spanish
+  // Call internal translation API to translate texts to Spanish
   async function requestTranslations(texts) {
     const res = await fetch(API_URL, {
       method: 'POST',
