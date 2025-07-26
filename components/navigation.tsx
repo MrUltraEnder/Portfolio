@@ -97,6 +97,11 @@ export function Navigation() {
                 <Download className="w-4 h-4 mr-2" />
                 Resume
               </Button>
+              <button
+                type="button"
+                className="language-toggle px-3 py-2 rounded-md text-sm font-medium text-[#F4F4F5] hover:bg-[#232329] focus:outline-none focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10]"
+                aria-label="Toggle language"
+              >ES</button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -157,6 +162,11 @@ export function Navigation() {
                       <Download className="w-4 h-4 mr-2" />
                       Download Resume
                     </Button>
+                    <button
+                      type="button"
+                      className="language-toggle w-full px-4 py-2 rounded-md text-sm font-medium text-[#F4F4F5] hover:bg-[#232329] focus:outline-none focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10]"
+                      aria-label="Toggle language"
+                    >ES</button>
                   </div>
                 </div>
               </SheetContent>
