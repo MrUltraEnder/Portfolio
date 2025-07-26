@@ -17,6 +17,16 @@ export default function UnityDeveloperPage() {
 
   const projects = [
     {
+      name: "Emplayer",
+      description:
+        "Mini-Boss de un mini juego, donde esquivas y haces parry.",
+      tech: ["Unity", "WebGL", "Game Jam"],
+      metrics: { genre: "Boss Battle", platform: "Web", team: "8 devs" },
+      video:
+        "https://img.itch.zone/aW1hZ2UvMTEwNDU3OS82MzczMzY2LnBuZw==/794x1000/sQccdG.png",
+      featured: true,
+    },
+    {
       name: "VR Training Modules",
       description:
         "Enterprise VR training solutions that boosted employee retention by 15% and reduced training costs by 20%.",
