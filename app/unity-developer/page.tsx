@@ -1,243 +1,354 @@
-import { ArrowLeft, Download, ExternalLink, Github, Linkedin, Mail, Play } from "lucide-react"
-import Link from "next/link"
+import { Download, ExternalLink, Linkedin, Mail, Play, Phone, Filter, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Navigation } from "@/components/navigation"
+import { BreadcrumbNav } from "@/components/breadcrumb-nav"
+import { RoleSwitcher } from "@/components/role-switcher"
+import { TableOfContents } from "@/components/table-of-contents"
+import { ProgressIndicator } from "@/components/progress-indicator"
 
 export default function UnityDeveloperPage() {
+  const tocItems = [
+    { id: "about", title: "About Me", level: 1 },
+    { id: "projects", title: "Featured Projects", level: 1 },
+    { id: "experience", title: "Experience", level: 1 },
+    { id: "skills", title: "Skills & Tools", level: 1 },
+    { id: "contact", title: "Contact", level: 1 },
+  ]
+
   const projects = [
     {
-      name: "VR Physics Playground",
-      description: "Interactive VR environment with advanced physics simulation and haptic feedback systems.",
-      tech: ["Unity", "VR", "Physics", "C#"],
+      name: "VR Training Modules",
+      description:
+        "Enterprise VR training solutions that boosted employee retention by 15% and reduced training costs by 20%.",
+      tech: ["Unity", "VR", "Enterprise", "Training"],
+      metrics: { retention: "+15%", cost: "-20%", users: "500+" },
       video: "/placeholder.svg?height=300&width=500",
+      featured: true,
     },
     {
-      name: "Unity Editor Tools Suite",
-      description: "Custom editor tools for level design automation and asset pipeline optimization.",
-      tech: ["Unity", "Editor Tools", "Automation", "Pipeline"],
+      name: "Interactive AR Applications",
+      description:
+        "Over 20 interactive apps using AR technology, AI integration, and multiplayer capabilities for enterprise clients.",
+      tech: ["Unity", "AR", "AI", "Multiplayer"],
+      metrics: { apps: "20+", engagement: "+48.7%", crashes: "-74.3%" },
       video: "/placeholder.svg?height=300&width=500",
+      featured: true,
     },
     {
-      name: "Multiplayer Combat System",
-      description: "Real-time multiplayer combat with client-side prediction and server reconciliation.",
-      tech: ["Unity", "Netcode", "Multiplayer", "Combat"],
+      name: "Grimoire Games Projects",
+      description: "Led development of 13+ award-winning games across different genres with teams of 4-20 members.",
+      tech: ["Unity", "Leadership", "Game Design", "Team Management"],
+      metrics: { games: "13+", awards: "Multiple", team: "4-20" },
       video: "/placeholder.svg?height=300&width=500",
+      featured: false,
     },
     {
-      name: "Procedural World Generator",
-      description: "Infinite terrain generation with biome blending and dynamic LOD optimization.",
-      tech: ["Unity", "Procedural", "Terrain", "Optimization"],
+      name: "API-Connected Systems",
+      description: "10+ interactive systems with JSON integration and API connectivity for real-time data processing.",
+      tech: ["Unity", "APIs", "JSON", "Database"],
+      metrics: { systems: "10+", uptime: "99.9%", response: "<100ms" },
       video: "/placeholder.svg?height=300&width=500",
+      featured: false,
     },
   ]
 
   const experience = [
     {
-      studio: "Indie Game Studio",
-      role: "Lead Unity Developer",
-      dates: "2022 - Present",
-      highlights: "Built core gameplay systems, VR integration, and custom editor tools",
+      studio: "Inmersys",
+      role: "XR Designer",
+      dates: "June 2024 - June 2025",
+      highlights: "Created immersive 3D environments and VR prototypes, improving client delivery timelines by 25%",
+      current: true,
     },
     {
-      studio: "Tech Startup",
+      studio: "FUSE People & Technology",
       role: "Unity Developer",
-      dates: "2020 - 2022",
-      highlights: "Developed AR applications and real-time multiplayer systems",
+      dates: "August 2022 - June 2025",
+      highlights:
+        "Developed 20+ interactive apps, improved player engagement by 48.7% and reduced crash rates by 74.3%",
+      current: true,
     },
     {
-      studio: "Freelance",
-      role: "Unity Consultant",
-      dates: "2019 - 2020",
-      highlights: "Performance optimization and technical architecture consulting",
+      studio: "Grimoire Games",
+      role: "Unity Game Developer",
+      dates: "November 2020 - Present",
+      highlights: "Led teams through 15+ game developments, created 13+ award-winning projects across various genres",
+      current: true,
     },
   ]
 
-  const skills = [
-    "Unity",
-    "C#",
-    "Shader Graph",
-    "VR/AR",
-    "WebGL",
-    "Git",
-    "AI/ML",
-    "Multiplayer",
-    "Clean Code",
-    "Performance",
-    "Editor Tools",
-    "Physics",
+  const skillCategories = [
+    {
+      category: "Core Technologies",
+      skills: ["Unity", "C#", ".NET", "Visual Studio"],
+    },
+    {
+      category: "XR Development",
+      skills: ["VR/AR", "OpenXR", "Oculus SDK", "HoloLens"],
+    },
+    {
+      category: "Multiplayer & Networking",
+      skills: ["Multiplayer", "Photon", "Mirror", "WebRTC"],
+    },
+    {
+      category: "Integration & APIs",
+      skills: ["APIs", "JSON", "REST", "WebGL"],
+    },
+    {
+      category: "Graphics & Rendering",
+      skills: ["Shaders", "HLSL", "URP", "HDRP"],
+    },
+    {
+      category: "Leadership & Process",
+      skills: ["Team Leadership", "Agile", "Code Review", "Mentoring"],
+    },
   ]
 
   return (
     <div className="min-h-screen bg-[#0e0e10] text-[#F4F4F5]">
+      <ProgressIndicator />
+      <Navigation />
+      <RoleSwitcher />
+      <TableOfContents items={tocItems} />
+
       {/* Background effects */}
       <div className="fixed inset-0 opacity-10">
         <div className="absolute inset-0 bg-gradient-to-br from-[#7EE787]/20 via-transparent to-[#A970FF]/10"></div>
         <div className="floating-particles"></div>
       </div>
 
-      {/* Navigation */}
-      <nav className="relative z-20 p-6">
-        <Link href="/" className="inline-flex items-center text-[#7EE787] hover:text-[#7EE787]/80 transition-colors">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Home
-        </Link>
-      </nav>
+      <div className="relative z-10 pt-20">
+        <BreadcrumbNav />
 
-      <div className="relative z-10">
-        {/* Hero Section */}
-        <section className="px-6 py-20 text-center">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-[#7EE787] to-[#A970FF] bg-clip-text text-transparent animate-fade-in">
-              Eric Z. — Unity Developer
-            </h1>
-            <p className="text-xl md:text-2xl text-[#F4F4F5]/80 mb-8 animate-slide-up">
-              Engineering immersive gameplay, systems & tools in Unity
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
-              <Button className="bg-[#7EE787] text-[#0e0e10] hover:bg-[#7EE787]/90 px-8 py-3 text-lg">
-                <Play className="w-5 h-5 mr-2" />
-                View Projects
-              </Button>
-              <Button
-                variant="outline"
-                className="border-[#7EE787] text-[#7EE787] hover:bg-[#7EE787]/10 px-8 py-3 text-lg bg-transparent"
-              >
-                <Download className="w-5 h-5 mr-2" />
-                Download Resume
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* About Section */}
-        <section className="px-6 py-20">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold mb-8 text-[#7EE787]">About Me</h2>
-            <div className="bg-[#232329]/30 backdrop-blur-sm rounded-2xl p-8 border border-[#232329]">
-              <p className="text-lg leading-relaxed text-[#F4F4F5]/90">
-                I'm a passionate Unity developer with a deep love for creating immersive experiences that push the
-                boundaries of interactive technology. My expertise spans from VR/AR applications to complex multiplayer
-                systems, always focusing on clean architecture and performance optimization. I thrive on solving
-                technical challenges and building tools that empower other developers. Whether it's crafting custom
-                editor extensions, implementing advanced physics simulations, or optimizing rendering pipelines, I bring
-                both technical precision and creative vision to every project.
+        <main id="main-content">
+          {/* Hero Section */}
+          <section className="px-6 py-20 text-center">
+            <div className="max-w-4xl mx-auto">
+              <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-[#7EE787] to-[#A970FF] bg-clip-text text-transparent animate-fade-in">
+                Eric Zaleta — Unity Developer
+              </h1>
+              <p className="text-xl md:text-2xl text-[#F4F4F5]/80 mb-8 animate-slide-up">
+                Engineering immersive gameplay, XR experiences & interactive applications
               </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Featured Projects */}
-        <section className="px-6 py-20">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold mb-12 text-[#7EE787]">Featured Projects</h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              {projects.map((project, index) => (
-                <div
-                  key={index}
-                  className="project-card bg-[#232329]/30 backdrop-blur-sm rounded-2xl overflow-hidden border border-[#232329] hover:border-[#7EE787]/30 transition-all duration-500 group"
+              <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
+                <Button className="bg-[#7EE787] text-[#0e0e10] hover:bg-[#7EE787]/90 px-8 py-4 text-lg h-auto focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10]">
+                  <Play className="w-6 h-6 mr-3" />
+                  View Projects
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-[#7EE787] text-[#7EE787] hover:bg-[#7EE787]/10 px-8 py-4 text-lg bg-transparent h-auto focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10]"
                 >
-                  <div className="aspect-video bg-[#232329]/50 relative overflow-hidden">
-                    <img
-                      src={project.video || "/placeholder.svg"}
-                      alt={project.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e10]/80 to-transparent"></div>
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold mb-3 text-[#F4F4F5]">{project.name}</h3>
-                    <p className="text-[#F4F4F5]/70 mb-4">{project.description}</p>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {project.tech.map((tech, techIndex) => (
-                        <span key={techIndex} className="px-3 py-1 bg-[#7EE787]/20 text-[#7EE787] rounded-full text-sm">
-                          #{tech}
+                  <Download className="w-6 h-6 mr-3" />
+                  Download Resume
+                </Button>
+              </div>
+            </div>
+          </section>
+
+          {/* About Section */}
+          <section id="about" className="px-6 py-20">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-3xl font-bold mb-8 text-[#7EE787]">About Me</h2>
+              <div className="bg-[#232329]/30 backdrop-blur-sm rounded-2xl p-8 border border-[#232329]">
+                <p className="text-lg leading-relaxed text-[#F4F4F5]/90 mb-6">
+                  I'm a passionate Unity developer with over 6 years of experience creating immersive experiences that
+                  push the boundaries of interactive technology. My expertise spans from VR/AR applications to
+                  multiplayer systems and interactive enterprise applications.
+                </p>
+                <p className="text-lg leading-relaxed text-[#F4F4F5]/90">
+                  I've led teams of 4-20 members through the development of 15+ video games and created over 20
+                  interactive apps using cutting-edge technologies. Whether it's crafting XR training modules,
+                  implementing AI systems, or optimizing performance pipelines, I bring both technical precision and
+                  creative vision to every project.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Featured Projects */}
+          <section id="projects" className="px-6 py-20">
+            <div className="max-w-6xl mx-auto">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-12">
+                <h2 className="text-3xl font-bold text-[#7EE787] mb-4 md:mb-0">Featured Projects</h2>
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-[#7EE787]/30 text-[#7EE787] hover:bg-[#7EE787]/10 bg-transparent"
+                  >
+                    <Filter className="w-4 h-4 mr-2" />
+                    Filter
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-[#7EE787]/30 text-[#7EE787] hover:bg-[#7EE787]/10 bg-transparent"
+                  >
+                    <Search className="w-4 h-4 mr-2" />
+                    Search
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8">
+                {projects.map((project, index) => (
+                  <article
+                    key={index}
+                    className="project-card bg-[#232329]/30 backdrop-blur-sm rounded-2xl overflow-hidden border border-[#232329] hover:border-[#7EE787]/30 transition-all duration-500 group focus-within:ring-2 focus-within:ring-[#7EE787] focus-within:ring-offset-2 focus-within:ring-offset-[#0e0e10]"
+                  >
+                    <div className="aspect-video bg-[#232329]/50 relative overflow-hidden">
+                      <img
+                        src={project.video || "/placeholder.svg"}
+                        alt={`${project.name} project screenshot`}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e10]/80 to-transparent"></div>
+                      {project.featured && (
+                        <div className="absolute top-4 left-4 bg-[#7EE787] text-[#0e0e10] px-3 py-1 rounded-full text-xs font-medium">
+                          Featured
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold mb-3 text-[#F4F4F5]">{project.name}</h3>
+                      <p className="text-[#F4F4F5]/70 mb-4 leading-relaxed">{project.description}</p>
+
+                      {/* Metrics */}
+                      <div className="flex flex-wrap gap-3 mb-4">
+                        {Object.entries(project.metrics).map(([key, value]) => (
+                          <div key={key} className="bg-[#7EE787]/10 px-3 py-1 rounded-full">
+                            <span className="text-xs text-[#7EE787] font-medium">{value}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {project.tech.map((tech, techIndex) => (
+                          <span
+                            key={techIndex}
+                            className="px-3 py-1 bg-[#232329]/50 text-[#F4F4F5]/80 rounded-full text-sm border border-[#232329]"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+
+                      <Button
+                        variant="ghost"
+                        className="text-[#7EE787] hover:bg-[#7EE787]/10 p-3 h-auto focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#232329]"
+                        aria-label={`View ${project.name} project details`}
+                      >
+                        <ExternalLink className="w-5 h-5" />
+                      </Button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Experience Timeline */}
+          <section id="experience" className="px-6 py-20">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-3xl font-bold mb-12 text-[#7EE787]">Experience</h2>
+              <div className="space-y-8">
+                {experience.map((exp, index) => (
+                  <article key={index} className="flex gap-6 group">
+                    <div className="flex-shrink-0 w-4 h-4 bg-[#7EE787] rounded-full mt-2 group-hover:scale-125 transition-transform relative">
+                      {exp.current && <div className="absolute inset-0 bg-[#7EE787] rounded-full animate-ping"></div>}
+                    </div>
+                    <div className="bg-[#232329]/30 backdrop-blur-sm rounded-xl p-6 border border-[#232329] flex-1 hover:border-[#7EE787]/30 transition-colors">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
+                        <h3 className="text-xl font-bold text-[#F4F4F5]">{exp.studio}</h3>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[#7EE787] font-medium">{exp.dates}</span>
+                          {exp.current && (
+                            <span className="bg-[#7EE787]/20 text-[#7EE787] px-2 py-1 rounded-full text-xs font-medium">
+                              Current
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-[#A970FF] font-medium mb-2">{exp.role}</p>
+                      <p className="text-[#F4F4F5]/70 leading-relaxed">{exp.highlights}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Skills & Tools */}
+          <section id="skills" className="px-6 py-20">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-3xl font-bold mb-12 text-[#7EE787]">Skills & Tools</h2>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {skillCategories.map((category, index) => (
+                  <div key={index} className="bg-[#232329]/30 backdrop-blur-sm rounded-xl p-6 border border-[#232329]">
+                    <h3 className="text-lg font-semibold text-[#F4F4F5] mb-4">{category.category}</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {category.skills.map((skill, skillIndex) => (
+                        <span
+                          key={skillIndex}
+                          className="skill-badge bg-[#232329]/50 backdrop-blur-sm rounded-lg px-3 py-2 text-center border border-[#232329] relative overflow-hidden text-sm text-[#F4F4F5]/90"
+                        >
+                          {skill}
                         </span>
                       ))}
                     </div>
-                    <Button variant="ghost" className="text-[#7EE787] hover:bg-[#7EE787]/10 p-0">
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      View Project
-                    </Button>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Experience Timeline */}
-        <section className="px-6 py-20">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold mb-12 text-[#7EE787]">Experience</h2>
-            <div className="space-y-8">
-              {experience.map((exp, index) => (
-                <div key={index} className="flex gap-6 group">
-                  <div className="flex-shrink-0 w-4 h-4 bg-[#7EE787] rounded-full mt-2 group-hover:scale-125 transition-transform"></div>
-                  <div className="bg-[#232329]/30 backdrop-blur-sm rounded-xl p-6 border border-[#232329] flex-1 hover:border-[#7EE787]/30 transition-colors">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
-                      <h3 className="text-xl font-bold text-[#F4F4F5]">{exp.studio}</h3>
-                      <span className="text-[#7EE787] font-medium">{exp.dates}</span>
-                    </div>
-                    <p className="text-[#A970FF] font-medium mb-2">{exp.role}</p>
-                    <p className="text-[#F4F4F5]/70">{exp.highlights}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Skills & Tools */}
-        <section className="px-6 py-20">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold mb-12 text-[#7EE787]">Skills & Tools</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {skills.map((skill, index) => (
-                <div
-                  key={index}
-                  className="skill-badge bg-[#232329]/50 backdrop-blur-sm rounded-xl px-4 py-3 text-center border border-[#232329] relative overflow-hidden"
+          {/* Contact Section */}
+          <section id="contact" className="px-6 py-20">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="text-3xl font-bold mb-6 text-[#7EE787]">Let's Build Something Amazing</h2>
+              <p className="text-xl text-[#F4F4F5]/80 mb-8 leading-relaxed">
+                Ready to bring your next Unity project to life? Let's collaborate and create something extraordinary.
+              </p>
+              <div className="flex flex-wrap justify-center gap-4 mb-12">
+                <Button
+                  asChild
+                  className="bg-[#7EE787] text-[#0e0e10] hover:bg-[#7EE787]/90 px-8 py-4 text-lg h-auto focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10]"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#7EE787]/5 to-[#A970FF]/5 opacity-50"></div>
-                  <span className="relative text-[#F4F4F5] font-medium text-sm">{skill}</span>
-                </div>
-              ))}
+                  <a href="mailto:ericzaleta@gmail.com">
+                    <Mail className="w-6 h-6 mr-3" />
+                    ericzaleta@gmail.com
+                  </a>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="border-[#7EE787] text-[#7EE787] hover:bg-[#7EE787]/10 p-4 bg-transparent h-auto focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10]"
+                  title="LinkedIn Profile"
+                >
+                  <a href="https://linkedin.com/in/ericzaleta" target="_blank" rel="noopener noreferrer">
+                    <Linkedin className="w-6 h-6" />
+                  </a>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="border-[#7EE787] text-[#7EE787] hover:bg-[#7EE787]/10 p-4 bg-transparent h-auto focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10]"
+                  title="Call +52 481 112 4012"
+                >
+                  <a href="tel:+524811124012">
+                    <Phone className="w-6 h-6" />
+                  </a>
+                </Button>
+              </div>
             </div>
-          </div>
-        </section>
-
-        {/* Contact Section */}
-        <section className="px-6 py-20">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-6 text-[#7EE787]">Let's Build Something Amazing</h2>
-            <p className="text-xl text-[#F4F4F5]/80 mb-8">
-              Ready to bring your next Unity project to life? Let's collaborate and create something extraordinary.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4 mb-12">
-              <Button className="bg-[#7EE787] text-[#0e0e10] hover:bg-[#7EE787]/90 px-6 py-3">
-                <Mail className="w-5 h-5 mr-2" />
-                Email Me
-              </Button>
-              <Button
-                variant="outline"
-                className="border-[#7EE787] text-[#7EE787] hover:bg-[#7EE787]/10 px-6 py-3 bg-transparent"
-              >
-                <Linkedin className="w-5 h-5 mr-2" />
-                LinkedIn
-              </Button>
-              <Button
-                variant="outline"
-                className="border-[#7EE787] text-[#7EE787] hover:bg-[#7EE787]/10 px-6 py-3 bg-transparent"
-              >
-                <Github className="w-5 h-5 mr-2" />
-                GitHub
-              </Button>
-            </div>
-          </div>
-        </section>
+          </section>
+        </main>
 
         {/* Footer */}
         <footer className="px-6 py-8 border-t border-[#232329]">
           <div className="max-w-4xl mx-auto text-center text-[#F4F4F5]/60">
-            <p>Eric Z. © {new Date().getFullYear()} • Made with love and code</p>
+            <p>Eric Zaleta © {new Date().getFullYear()} • Crafted with passion and precision</p>
           </div>
         </footer>
       </div>

@@ -6,13 +6,14 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Eric Z. - Unity Developer & Game Designer",
+  title: "Eric Zaleta - Unity Developer & Game Designer",
   description:
-    "Creative portfolio showcasing Unity development and game design expertise with a focus on immersive experiences and innovative gameplay systems.",
-  keywords: "Unity Developer, Game Designer, VR, AR, Game Development, Interactive Design",
-  authors: [{ name: "Eric Z." }],
+    "Over 6 years of Unity development experience creating immersive VR/AR applications, interactive games, and enterprise solutions. Led 15+ game development projects with award-winning results.",
+  keywords:
+    "Unity Developer, Game Designer, VR, AR, XR Designer, Interactive Applications, Game Development, Eric Zaleta",
+  authors: [{ name: "Eric Zaleta" }],
   viewport: "width=device-width, initial-scale=1",
-    generator: 'v0.dev'
+  generator: "v0.dev",
 }
 
 export default function RootLayout({
@@ -22,7 +23,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={inter.className}>{children}</body>
+      <head>
+        <meta name="theme-color" content="#0e0e10" />
+        <meta name="color-scheme" content="dark" />
+      </head>
+      <body className={`${inter.className} antialiased`}>{children}</body>
     </html>
   )
 }
