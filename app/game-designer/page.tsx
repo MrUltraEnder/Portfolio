@@ -17,6 +17,16 @@ export default function GameDesignerPage() {
 
   const projects = [
     {
+      name: "Emplayer",
+      description:
+        "Mini-Boss de un mini juego, donde esquivas y haces parry.",
+      focus: ["Boss Design", "Parry Mechanics", "2D Action"],
+      metrics: { genre: "Action", mode: "Parry", platform: "Web" },
+      video:
+        "https://img.itch.zone/aW1hZ2UvMTEwNDU3OS82MzczMzY2LnBuZw==/794x1000/sQccdG.png",
+      featured: true,
+    },
+    {
       name: "Quantum Puzzle Mechanics",
       description:
         "Mind-bending puzzle system where players manipulate quantum states to solve multi-dimensional challenges.",
