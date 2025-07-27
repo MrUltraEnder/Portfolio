@@ -39,13 +39,23 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
         // Reload page to reset to English
         window.location.reload()
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Translation error:', error)
-      toast({
-        title: "Error de traducción",
-        description: "No se pudo traducir la página. Verifica la configuración de la API.",
-        variant: "destructive",
-      })
+      
+      // Show specific error message based on the error type
+      if (error.message.includes('API key not configured')) {
+        toast({
+          title: "API Key requerida",
+          description: "Configura tu Google Cloud Translation API key en .env.local para usar la traducción.",
+          variant: "destructive",
+        })
+      } else {
+        toast({
+          title: "Error de traducción",
+          description: error.message || "No se pudo traducir la página. Verifica la configuración de la API.",
+          variant: "destructive",
+        })
+      }
     } finally {
       setIsTranslating(false)
     }
@@ -70,28 +80,46 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
     if (uniqueTexts.length === 0) return
 
     try {
+      // For GitHub Pages (static export), call Google Translate API directly
+      // The API key is embedded during build time as a public environment variable
+      const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_TRANSLATE_API_KEY;
+      
+      if (!API_KEY) {
+        throw new Error('Translation API key not configured for production build')
+      }
+      
       // Translate texts in batches
       const batchSize = 20
       const translations: { [key: string]: string } = {}
       
       for (let i = 0; i < uniqueTexts.length; i += batchSize) {
         const batch = uniqueTexts.slice(i, i + batchSize)
-        const response = await fetch('/api/translate', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            q: batch,
-            source,
-            target,
-            format: 'text'
-          }),
-        })
+        
+        // Call Google Translate API directly
+        const response = await fetch(
+          `https://translation.googleapis.com/language/translate/v2?key=${API_KEY}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              q: batch,
+              source,
+              target,
+              format: 'text'
+            }),
+          }
+        )
 
         if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.error || 'Translation failed')
+          const errorText = await response.text()
+          console.error('Google Translate API Error:', {
+            status: response.status,
+            statusText: response.statusText,
+            error: errorText
+          })
+          throw new Error(`Translation API error: ${response.status}`)
         }
 
         const data = await response.json()
