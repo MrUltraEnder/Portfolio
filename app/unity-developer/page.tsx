@@ -8,21 +8,10 @@ import { RoleSwitcher } from "@/components/role-switcher"
 import { TableOfContents } from "@/components/table-of-contents"
 import { ProgressIndicator } from "@/components/progress-indicator"
 import { LanguageToggle } from "@/components/language-toggle"
-import { useItchGames } from "@/hooks/use-itch-games"
+import { useItchGames, Project } from "@/hooks/use-itch-games"
 
 export default function UnityDeveloperPage() {
-  const { convertToProjects, loading } = useItchGames()
-  
-  interface ProjectType {
-    name: string
-    description: string
-    tech?: string[]
-    metrics: Record<string, string>
-    video: string
-    featured: boolean
-    type: 'static' | 'itch'
-    url?: string
-  }
+  const { convertToProjects, loading, searchTerm, setSearchTerm } = useItchGames()
   
   const tocItems = [
     { id: "about", title: "About Me", level: 1 },
@@ -32,70 +21,14 @@ export default function UnityDeveloperPage() {
     { id: "contact", title: "Contact", level: 1 },
   ]
 
-  // Combine static projects with Itch.io games
-  const staticProjects: ProjectType[] = [
-    {
-      name: "Emplayer",
-      description:
-        "Mini-Boss de un mini juego, donde esquivas y haces parry.",
-      tech: ["Unity", "WebGL", "Game Jam"],
-      metrics: { genre: "Boss Battle", platform: "Web", team: "8 devs" },
-      video:
-        "https://img.itch.zone/aW1hZ2UvMTEwNDU3OS82MzczMzY2LnBuZw==/794x1000/sQccdG.png",
-      featured: true,
-      type: 'static'
-    },
-    {
-      name: "VR Training Modules",
-      description:
-        "Enterprise VR training solutions that boosted employee retention by 15% and reduced training costs by 20%.",
-      tech: ["Unity", "VR", "Enterprise", "Training"],
-      metrics: { retention: "+15%", cost: "-20%", users: "500+" },
-      video: "/placeholder.svg?height=300&width=500",
-      featured: true,
-      type: 'static'
-    },
-    {
-      name: "Interactive AR Applications",
-      description:
-        "Over 20 interactive apps using AR technology, AI integration, and multiplayer capabilities for enterprise clients.",
-      tech: ["Unity", "AR", "AI", "Multiplayer"],
-      metrics: { apps: "20+", engagement: "+48.7%", crashes: "-74.3%" },
-      video: "/placeholder.svg?height=300&width=500",
-      featured: true,
-      type: 'static'
-    },
-    {
-      name: "Grimoire Games Projects",
-      description: "Led development of 13+ award-winning games across different genres with teams of 4-20 members.",
-      tech: ["Unity", "Leadership", "Game Design", "Team Management"],
-      metrics: { games: "13+", awards: "Multiple", team: "4-20" },
-      video: "/placeholder.svg?height=300&width=500",
-      featured: false,
-      type: 'static'
-    },
-    {
-      name: "API-Connected Systems",
-      description: "10+ interactive systems with JSON integration and API connectivity for real-time data processing.",
-      tech: ["Unity", "APIs", "JSON", "Database"],
-      metrics: { systems: "10+", uptime: "99.9%", response: "<100ms" },
-      video: "/placeholder.svg?height=300&width=500",
-      featured: false,
-      type: 'static'
-    },
-  ]
+  // Only show Itch.io projects in featured section
+  const itchProjects: Project[] = convertToProjects('unity').map(project => ({
+    ...project,
+    tech: project.tech || []
+  }))
 
-  // Combine static and Itch.io projects
-  const allProjects: ProjectType[] = [
-    ...staticProjects,
-    ...convertToProjects('unity').map(project => ({
-      ...project,
-      tech: project.tech || []
-    }))
-  ]
-
-  // Show only featured projects
-  const projects = allProjects.filter(project => project.featured)
+  // Show only Itch.io projects as featured
+  const projects = itchProjects
 
   const experience = [
     {
@@ -177,9 +110,14 @@ export default function UnityDeveloperPage() {
                 Engineering immersive gameplay, XR experiences & interactive applications
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
-                <Button className="bg-[#7EE787] text-[#0e0e10] hover:bg-[#7EE787]/90 px-8 py-4 text-lg h-auto focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10]">
-                  <Play className="w-6 h-6 mr-3" />
-                  View Projects
+                <Button 
+                  asChild
+                  className="bg-[#7EE787] text-[#0e0e10] hover:bg-[#7EE787]/90 px-8 py-4 text-lg h-auto focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10]"
+                >
+                  <a href="#projects" className="flex items-center">
+                    <Play className="w-6 h-6 mr-3" />
+                    View Projects
+                  </a>
                 </Button>
                 <Button
                   variant="outline"
@@ -226,89 +164,53 @@ export default function UnityDeveloperPage() {
               <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-12">
                 <h2 className="text-3xl font-bold text-[#7EE787] mb-4 md:mb-0">Featured Projects</h2>
                 <div className="flex gap-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-[#7EE787]/30 text-[#7EE787] hover:bg-[#7EE787]/10 bg-transparent"
-                  >
-                    <Filter className="w-4 h-4 mr-2" />
-                    Filter
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-[#7EE787]/30 text-[#7EE787] hover:bg-[#7EE787]/10 bg-transparent"
-                  >
-                    <Search className="w-4 h-4 mr-2" />
-                    Search
-                  </Button>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#7EE787]/60" />
+                    <input
+                      type="text"
+                      placeholder="Search projects..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 pr-4 py-2 bg-[#232329]/50 border border-[#7EE787]/30 rounded-lg text-[#F4F4F5] placeholder-[#F4F4F5]/50 focus:outline-none focus:ring-2 focus:ring-[#7EE787] focus:border-transparent"
+                    />
+                  </div>
                 </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-8">
-                {projects.map((project, index) => (
-                  <article
-                    key={index}
-                    className="project-card bg-[#232329]/30 backdrop-blur-sm rounded-2xl overflow-hidden border border-[#232329] hover:border-[#7EE787]/30 transition-all duration-500 group focus-within:ring-2 focus-within:ring-[#7EE787] focus-within:ring-offset-2 focus-within:ring-offset-[#0e0e10]"
-                  >
-                    <div className="aspect-video bg-[#232329]/50 relative overflow-hidden">
-                      <img
-                        src={project.video || "/placeholder.svg"}
-                        alt={`${project.name} project screenshot`}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e10]/80 to-transparent"></div>
-                      {project.featured && (
-                        <div className="absolute top-4 left-4 bg-[#7EE787] text-[#0e0e10] px-3 py-1 rounded-full text-xs font-medium">
-                          Featured
-                        </div>
+                {loading ? (
+                  // Loading state
+                  <div className="col-span-full text-center py-16">
+                    <div className="animate-spin w-8 h-8 border-2 border-[#7EE787] border-t-transparent rounded-full mx-auto mb-4"></div>
+                    <p className="text-[#F4F4F5]/60">Loading projects from Itch.io...</p>
+                  </div>
+                ) : projects.length === 0 ? (
+                  // No projects state
+                  <div className="col-span-full text-center py-16">
+                    <h3 className="text-xl text-[#F4F4F5]/60 mb-4">No games found</h3>
+                    <p className="text-[#F4F4F5]/40">Published games from Itch.io will appear here</p>
+                  </div>
+                ) : (
+                  projects.map((project, index) => (
+                    <article
+                      key={index}
+                      className="project-card bg-[#232329]/30 backdrop-blur-sm rounded-2xl overflow-hidden border border-[#232329] hover:border-[#7EE787]/30 transition-all duration-500 group focus-within:ring-2 focus-within:ring-[#7EE787] focus-within:ring-offset-2 focus-within:ring-offset-[#0e0e10]"
+                    >
+                      {project.url ? (
+                        <a
+                          href={project.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block h-full"
+                        >
+                          <ProjectContent project={project} />
+                        </a>
+                      ) : (
+                        <ProjectContent project={project} />
                       )}
-                    </div>
-                    <div className="p-6">
-                      <h3 className="text-xl font-bold mb-3 text-[#F4F4F5]">{project.name}</h3>
-                      <p className="text-[#F4F4F5]/70 mb-4 leading-relaxed">{project.description}</p>
-
-                      {/* Metrics */}
-                      <div className="flex flex-wrap gap-3 mb-4">
-                        {Object.entries(project.metrics).map(([key, value]) => (
-                          <div key={key} className="bg-[#7EE787]/10 px-3 py-1 rounded-full">
-                            <span className="text-xs text-[#7EE787] font-medium">{value}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {project.tech?.map((tech, techIndex) => (
-                          <span
-                            key={techIndex}
-                            className="px-3 py-1 bg-[#232329]/50 text-[#F4F4F5]/80 rounded-full text-sm border border-[#232329]"
-                          >
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
-
-                      <Button
-                        variant="ghost"
-                        className="text-[#7EE787] hover:bg-[#7EE787]/10 p-3 h-auto focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#232329]"
-                        aria-label={`View ${project.name} project details`}
-                        asChild={!!project.url}
-                      >
-                        {project.url ? (
-                          <a
-                            href={project.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <ExternalLink className="w-5 h-5" />
-                          </a>
-                        ) : (
-                          <ExternalLink className="w-5 h-5" />
-                        )}
-                      </Button>
-                    </div>
-                  </article>
-                ))}
+                    </article>
+                  ))
+                )}
               </div>
             </div>
           </section>
@@ -418,5 +320,59 @@ export default function UnityDeveloperPage() {
         </footer>
       </div>
     </div>
+  )
+}
+
+function ProjectContent({ project }: { project: Project }) {
+  return (
+    <>
+      <div className="aspect-video bg-[#232329]/50 relative overflow-hidden">
+        <img
+          src={project.video || "/placeholder.svg"}
+          alt={`${project.name} project screenshot`}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e10]/80 to-transparent"></div>
+        {project.featured && (
+          <div className="absolute top-4 left-4 bg-[#7EE787] text-[#0e0e10] px-3 py-1 rounded-full text-xs font-medium">
+            Featured
+          </div>
+        )}
+      </div>
+      <div className="p-6">
+        <h3 className="text-xl font-bold mb-3 text-[#F4F4F5] group-hover:text-[#7EE787] transition-colors">{project.name}</h3>
+        <p className="text-[#F4F4F5]/70 mb-4 leading-relaxed">{project.description}</p>
+
+        {/* Metrics */}
+        <div className="flex flex-wrap gap-3 mb-4">
+          {Object.entries(project.metrics).map(([key, value]) => (
+            <div key={key} className="bg-[#7EE787]/10 px-3 py-1 rounded-full">
+              <span className="text-xs text-[#7EE787] font-medium">{value}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap gap-2 mb-4">
+          {project.tech?.map((tech, techIndex) => (
+            <span
+              key={techIndex}
+              className="px-3 py-1 bg-[#232329]/50 text-[#F4F4F5]/80 rounded-full text-sm border border-[#232329]"
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="flex items-center text-[#7EE787]/80 text-sm">
+            <ExternalLink className="w-4 h-4 mr-2" />
+            <span>Play on Itch.io</span>
+          </div>
+          <div className="text-[#F4F4F5]/60 text-xs">
+            {project.platform}
+          </div>
+        </div>
+      </div>
+    </>
   )
 }

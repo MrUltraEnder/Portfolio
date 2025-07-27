@@ -10,7 +10,7 @@ interface ItchGame {
   published_at: string
 }
 
-interface Project {
+export interface Project {
   name: string
   description: string
   tech?: string[]
@@ -20,12 +20,15 @@ interface Project {
   featured: boolean
   url?: string
   type: 'static' | 'itch'
+  published_date?: string
+  platform?: string
 }
 
 export function useItchGames() {
   const [itchGames, setItchGames] = useState<ItchGame[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
     async function loadItchGames() {
@@ -81,33 +84,53 @@ export function useItchGames() {
     loadItchGames()
   }, [])
 
+  // Filter games based on search term
+  const filteredGames = itchGames.filter(game => 
+    game.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (game.short_text && game.short_text.toLowerCase().includes(searchTerm.toLowerCase()))
+  )
+
   // Convert Itch.io games to project format
   const convertToProjects = (role: 'unity' | 'designer'): Project[] => {
-    return itchGames.slice(0, 3).map(game => ({
-      name: game.title,
-      description: game.short_text || 'Interactive game developed with Unity',
-      tech: role === 'unity' 
-        ? ['Unity', 'C#', 'WebGL', 'Game Development']
-        : undefined,
-      focus: role === 'designer'
-        ? ['Game Design', 'Player Experience', 'Interactive Systems', 'Gameplay Mechanics']
-        : undefined,
-      metrics: {
-        platform: 'Itch.io',
-        type: 'Game',
-        status: 'Published'
-      },
-      video: game.cover_url,
-      featured: true,
-      url: game.url,
-      type: 'itch' as const
-    }))
+    return filteredGames.map(game => {
+      const publishedDate = new Date(game.published_at)
+      const formattedDate = publishedDate.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short' 
+      })
+      
+      return {
+        name: game.title,
+        description: game.short_text || 'Interactive game developed with Unity',
+        tech: role === 'unity' 
+          ? ['Unity', 'C#', 'WebGL', 'Game Development']
+          : undefined,
+        focus: role === 'designer'
+          ? ['Game Design', 'Player Experience', 'Interactive Systems', 'Gameplay Mechanics']
+          : undefined,
+        metrics: {
+          platform: 'Itch.io',
+          published: formattedDate,
+          status: 'Live',
+          type: 'Indie Game'
+        },
+        video: game.cover_url,
+        featured: true,
+        url: game.url,
+        type: 'itch' as const,
+        published_date: game.published_at,
+        platform: 'Itch.io'
+      }
+    })
   }
 
   return {
     itchGames,
     loading,
     error,
-    convertToProjects
+    convertToProjects,
+    searchTerm,
+    setSearchTerm,
+    filteredGames
   }
 }

@@ -8,21 +8,10 @@ import { RoleSwitcher } from "@/components/role-switcher"
 import { TableOfContents } from "@/components/table-of-contents"
 import { ProgressIndicator } from "@/components/progress-indicator"
 import { LanguageToggle } from "@/components/language-toggle"
-import { useItchGames } from "@/hooks/use-itch-games"
+import { useItchGames, Project } from "@/hooks/use-itch-games"
 
 export default function GameDesignerPage() {
-  const { convertToProjects, loading } = useItchGames()
-  
-  interface ProjectType {
-    name: string
-    description: string
-    focus: string[]
-    metrics: Record<string, string>
-    video: string
-    featured: boolean
-    type: 'static' | 'itch'
-    url?: string
-  }
+  const { convertToProjects, loading, searchTerm, setSearchTerm } = useItchGames()
   
   const tocItems = [
     { id: "about", title: "About Me", level: 1 },
@@ -32,71 +21,14 @@ export default function GameDesignerPage() {
     { id: "contact", title: "Contact", level: 1 },
   ]
 
-  const staticProjects: ProjectType[] = [
-    {
-      name: "Emplayer",
-      description:
-        "Mini-Boss de un mini juego, donde esquivas y haces parry.",
-      focus: ["Boss Design", "Parry Mechanics", "2D Action"],
-      metrics: { genre: "Action", mode: "Parry", platform: "Web" },
-      video:
-        "https://img.itch.zone/aW1hZ2UvMTEwNDU3OS82MzczMzY2LnBuZw==/794x1000/sQccdG.png",
-      featured: true,
-      type: 'static'
-    },
-    {
-      name: "Quantum Puzzle Mechanics",
-      description:
-        "Mind-bending puzzle system where players manipulate quantum states to solve multi-dimensional challenges.",
-      focus: ["Puzzle Design", "Player Psychology", "Progressive Difficulty"],
-      metrics: { complexity: "Multi-dimensional", retention: "+85%", difficulty: "Adaptive" },
-      video: "/placeholder.svg?height=300&width=500",
-      featured: true,
-      type: 'static'
-    },
-    {
-      name: "Narrative Branching System",
-      description: "Dynamic storytelling framework that adapts to player choices with meaningful consequences.",
-      focus: ["Narrative Design", "Choice Architecture", "Player Agency"],
-      metrics: { branches: "50+", outcomes: "Dynamic", agency: "High" },
-      video: "/placeholder.svg?height=300&width=500",
-      featured: true,
-      type: 'static'
-    },
-    {
-      name: "Cooperative Strategy Game",
-      description: "Asymmetric multiplayer experience emphasizing communication and strategic planning.",
-      focus: ["Systems Design", "Multiplayer Balance", "Social Dynamics"],
-      metrics: { players: "2-8", balance: "Asymmetric", communication: "Essential" },
-      video: "/placeholder.svg?height=300&width=500",
-      featured: false,
-      type: 'static'
-    },
-    {
-      name: "Accessibility-First Platformer",
-      description: "Inclusive game design with customizable difficulty and multiple input methods.",
-      focus: ["UX Design", "Accessibility", "Inclusive Design"],
-      metrics: { accessibility: "WCAG 2.1", inputs: "Multiple", customization: "Full" },
-      video: "/placeholder.svg?height=300&width=500",
-      featured: false,
-      type: 'static'
-    },
-  ]
-
-  // Convert Itch.io games to game designer format
-  const itchProjects: ProjectType[] = convertToProjects('designer').map(project => ({
+  // Only show Itch.io projects in featured section
+  const itchProjects: Project[] = convertToProjects('designer').map(project => ({
     ...project,
     focus: project.focus || []
   }))
 
-  // Combine static and Itch.io projects
-  const allProjects: ProjectType[] = [
-    ...staticProjects,
-    ...itchProjects
-  ]
-
-  // Show only featured projects
-  const projects = allProjects.filter(project => project.featured)
+  // Show only Itch.io projects as featured
+  const projects = itchProjects
 
   const experience = [
     {
@@ -177,9 +109,14 @@ export default function GameDesignerPage() {
                 Designing meaningful interactions, systems, and player experiences
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
-                <Button className="bg-[#A970FF] text-[#F4F4F5] hover:bg-[#A970FF]/90 px-8 py-4 text-lg h-auto focus:ring-2 focus:ring-[#A970FF] focus:ring-offset-2 focus:ring-offset-[#0e0e10]">
-                  <Play className="w-6 h-6 mr-3" />
-                  View Projects
+                <Button 
+                  asChild
+                  className="bg-[#A970FF] text-[#F4F4F5] hover:bg-[#A970FF]/90 px-8 py-4 text-lg h-auto focus:ring-2 focus:ring-[#A970FF] focus:ring-offset-2 focus:ring-offset-[#0e0e10]"
+                >
+                  <a href="#projects" className="flex items-center">
+                    <Play className="w-6 h-6 mr-3" />
+                    View Projects
+                  </a>
                 </Button>
                 <Button
                   variant="outline"
@@ -225,90 +162,53 @@ export default function GameDesignerPage() {
             <div className="max-w-6xl mx-auto">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-12">
                 <h2 className="text-3xl font-bold text-[#A970FF] mb-4 md:mb-0">Featured Projects</h2>
-                <div className="flex gap-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-[#A970FF]/30 text-[#A970FF] hover:bg-[#A970FF]/10 bg-transparent"
-                  >
-                    <Filter className="w-4 h-4 mr-2" />
-                    Filter
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-[#A970FF]/30 text-[#A970FF] hover:bg-[#A970FF]/10 bg-transparent"
-                  >
-                    <Search className="w-4 h-4 mr-2" />
-                    Search
-                  </Button>
+                <div className="relative">
+                  <Search className="w-5 h-5 text-[#A970FF]/60 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Search projects..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="bg-[#232329]/50 border border-[#232329] rounded-lg pl-10 pr-4 py-2 text-[#F4F4F5] placeholder-[#F4F4F5]/50 focus:border-[#A970FF]/50 focus:outline-none transition-colors w-full md:w-64"
+                  />
                 </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-8">
-                {projects.map((project, index) => (
-                  <article
-                    key={index}
-                    className="project-card bg-[#232329]/30 backdrop-blur-sm rounded-2xl overflow-hidden border border-[#232329] hover:border-[#A970FF]/30 transition-all duration-500 group focus-within:ring-2 focus-within:ring-[#A970FF] focus-within:ring-offset-2 focus-within:ring-offset-[#0e0e10]"
-                  >
-                    <div className="aspect-video bg-[#232329]/50 relative overflow-hidden">
-                      <img
-                        src={project.video || "/placeholder.svg"}
-                        alt={`${project.name} project screenshot`}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e10]/80 to-transparent"></div>
-                      {project.featured && (
-                        <div className="absolute top-4 left-4 bg-[#A970FF] text-[#F4F4F5] px-3 py-1 rounded-full text-xs font-medium">
-                          Featured
-                        </div>
+                {loading ? (
+                  // Loading state
+                  <div className="col-span-full text-center py-16">
+                    <div className="animate-spin w-8 h-8 border-2 border-[#A970FF] border-t-transparent rounded-full mx-auto mb-4"></div>
+                    <p className="text-[#F4F4F5]/60">Loading projects from Itch.io...</p>
+                  </div>
+                ) : projects.length === 0 ? (
+                  // No projects state
+                  <div className="col-span-full text-center py-16">
+                    <h3 className="text-xl text-[#F4F4F5]/60 mb-4">No games found</h3>
+                    <p className="text-[#F4F4F5]/40">Published games from Itch.io will appear here</p>
+                  </div>
+                ) : (
+                  // Projects grid
+                  projects.map((project, index) => (
+                    <article
+                      key={index}
+                      className="project-card bg-[#232329]/30 backdrop-blur-sm rounded-2xl overflow-hidden border border-[#232329] hover:border-[#A970FF]/30 transition-all duration-500 group focus-within:ring-2 focus-within:ring-[#A970FF] focus-within:ring-offset-2 focus-within:ring-offset-[#0e0e10]"
+                    >
+                      {project.url ? (
+                        <a
+                          href={project.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block h-full"
+                        >
+                          <ProjectContent project={project} />
+                        </a>
+                      ) : (
+                        <ProjectContent project={project} />
                       )}
-                    </div>
-                    <div className="p-6">
-                      <h3 className="text-xl font-bold mb-3 text-[#F4F4F5]">{project.name}</h3>
-                      <p className="text-[#F4F4F5]/70 mb-4 leading-relaxed">{project.description}</p>
-
-                      {/* Metrics */}
-                      <div className="flex flex-wrap gap-3 mb-4">
-                        {Object.entries(project.metrics).map(([key, value]) => (
-                          <div key={key} className="bg-[#A970FF]/10 px-3 py-1 rounded-full">
-                            <span className="text-xs text-[#A970FF] font-medium">{value}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {project.focus.map((focus, focusIndex) => (
-                          <span
-                            key={focusIndex}
-                            className="px-3 py-1 bg-[#232329]/50 text-[#F4F4F5]/80 rounded-full text-sm border border-[#232329]"
-                          >
-                            {focus}
-                          </span>
-                        ))}
-                      </div>
-
-                      <Button
-                        variant="ghost"
-                        className="text-[#A970FF] hover:bg-[#A970FF]/10 p-3 h-auto focus:ring-2 focus:ring-[#A970FF] focus:ring-offset-2 focus:ring-offset-[#232329]"
-                        aria-label={`View ${project.name} project details`}
-                        asChild={!!project.url}
-                      >
-                        {project.url ? (
-                          <a
-                            href={project.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <ExternalLink className="w-5 h-5" />
-                          </a>
-                        ) : (
-                          <ExternalLink className="w-5 h-5" />
-                        )}
-                      </Button>
-                    </div>
-                  </article>
-                ))}
+                    </article>
+                  ))
+                )}
               </div>
             </div>
           </section>
@@ -421,5 +321,59 @@ export default function GameDesignerPage() {
         </footer>
       </div>
     </div>
+  )
+}
+
+function ProjectContent({ project }: { project: Project }) {
+  return (
+    <>
+      <div className="aspect-video bg-[#232329]/50 relative overflow-hidden">
+        <img
+          src={project.video || "/placeholder.svg"}
+          alt={`${project.name} project screenshot`}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e10]/80 to-transparent"></div>
+        {project.featured && (
+          <div className="absolute top-4 left-4 bg-[#A970FF] text-[#F4F4F5] px-3 py-1 rounded-full text-xs font-medium">
+            Featured
+          </div>
+        )}
+      </div>
+      <div className="p-6">
+        <h3 className="text-xl font-bold mb-3 text-[#F4F4F5] group-hover:text-[#A970FF] transition-colors">{project.name}</h3>
+        <p className="text-[#F4F4F5]/70 mb-4 leading-relaxed">{project.description}</p>
+
+        {/* Metrics */}
+        <div className="flex flex-wrap gap-3 mb-4">
+          {Object.entries(project.metrics).map(([key, value]) => (
+            <div key={key} className="bg-[#A970FF]/10 px-3 py-1 rounded-full">
+              <span className="text-xs text-[#A970FF] font-medium">{value}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap gap-2 mb-4">
+          {project.focus?.map((focus, focusIndex) => (
+            <span
+              key={focusIndex}
+              className="px-3 py-1 bg-[#232329]/50 text-[#F4F4F5]/80 rounded-full text-sm border border-[#232329]"
+            >
+              {focus}
+            </span>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="flex items-center text-[#A970FF]/80 text-sm">
+            <ExternalLink className="w-4 h-4 mr-2" />
+            <span>Play on Itch.io</span>
+          </div>
+          <div className="text-[#F4F4F5]/60 text-xs">
+            {project.platform}
+          </div>
+        </div>
+      </div>
+    </>
   )
 }
