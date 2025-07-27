@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eric Zaleta - Featured Games from Itch.io</title>
+  <meta name="description" content="Explore Eric Zaleta's published games and interactive experiences on Itch.io">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .line-clamp-3 {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .floating-particles {
+      background-image: 
+        radial-gradient(2px 2px at 20px 30px, rgba(126, 231, 135, 0.2), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(169, 112, 255, 0.2), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(126, 231, 135, 0.3), transparent),
+        radial-gradient(1px 1px at 130px 80px, rgba(169, 112, 255, 0.3), transparent);
+      background-repeat: repeat;
+      background-size: 200px 100px;
+      animation: float 20s infinite linear;
+    }
+    
+    @keyframes float {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(-200px, -100px); }
+    }
+  </style>
+</head>
+<body class="bg-[#0e0e10] text-[#F4F4F5] font-sans">
+  <!-- Background effects -->
+  <div class="fixed inset-0 opacity-20">
+    <div class="absolute inset-0 bg-gradient-to-br from-[#7EE787]/10 via-transparent to-[#A970FF]/10"></div>
+    <div class="floating-particles"></div>
+  </div>
+
+  <!-- Main content -->
+  <div class="relative z-10 min-h-screen">
+    <!-- Header -->
+    <header class="px-6 py-12">
+      <div class="max-w-6xl mx-auto text-center">
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-[#7EE787] to-[#A970FF] bg-clip-text text-transparent">
+          Featured Games
+        </h1>
+        <p class="text-lg md:text-xl text-[#F4F4F5]/80 max-w-2xl mx-auto">
+          Explore my published games and interactive experiences on Itch.io
+        </p>
+      </div>
+    </header>
+
+    <!-- Games Grid -->
+    <main class="px-6 pb-20">
+      <div class="max-w-6xl mx-auto">
+        
+          <div class="text-center py-20">
+            <div class="text-6xl mb-4">🎮</div>
+            <h2 class="text-2xl font-bold text-[#F4F4F5] mb-4">No games found</h2>
+            <p class="text-[#F4F4F5]/60">Games will appear here once they're published on Itch.io</p>
+          </div>
+        
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="px-6 py-8 border-t border-[#232329]/30">
+      <div class="max-w-6xl mx-auto text-center">
+        <p class="text-[#F4F4F5]/60 text-sm">
+          Games fetched from 
+          <a href="https://itch.io" target="_blank" rel="noopener noreferrer" class="text-[#7EE787] hover:underline">
+            Itch.io
+          </a>
+          • Last updated: 27/7/2025
+        </p>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

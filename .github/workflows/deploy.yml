@@ -27,6 +27,10 @@ jobs:
           node-version: 20
           cache: "pnpm"
       - run: pnpm install
+      - name: Fetch Itch.io games
+        run: node scripts/fetch-itch-games.js
+        env:
+          ITCH_API_KEY: ${{ secrets.ITCH_API_KEY }}
       - run: pnpm build
         env:
           NEXT_PUBLIC_GOOGLE_TRANSLATE_API_KEY: ${{ secrets.GOOGLE_TRANSLATE_API_KEY }}

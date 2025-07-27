@@ -7,7 +7,8 @@
     "dev": "next dev",
     "export": "next export",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "fetch-games": "node scripts/fetch-itch-games.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -65,6 +66,7 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.2.1",
     "postcss": "^8.5",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
