@@ -158,9 +158,16 @@ export function Navigation() {
                         Contact Me
                       </a>
                     </Button>
-                    <Button className="w-full bg-[#7EE787] text-[#0e0e10] hover:bg-[#7EE787]/90">
-                      <Download className="w-4 h-4 mr-2" />
-                      Download Resume
+                    <Button className="w-full bg-[#7EE787] text-[#0e0e10] hover:bg-[#7EE787]/90" asChild>
+                      <a
+                        href="/Portfolio/Eric-Zaleta-Unity-Developer-Resume.pdf"
+                        download="Eric-Zaleta-Unity-Developer-Resume.pdf"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Download Resume
+                      </a>
                     </Button>
                     <button
                       type="button"

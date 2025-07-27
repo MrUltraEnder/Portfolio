@@ -150,9 +150,17 @@ export default function UnityDeveloperPage() {
                 <Button
                   variant="outline"
                   className="border-[#7EE787] text-[#7EE787] hover:bg-[#7EE787]/10 px-8 py-4 text-lg bg-transparent h-auto focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10]"
+                  asChild
                 >
-                  <Download className="w-6 h-6 mr-3" />
-                  Download Resume
+                  <a
+                    href="/Portfolio/Eric-Zaleta-Unity-Developer-Resume.pdf"
+                    download="Eric-Zaleta-Unity-Developer-Resume.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Download className="w-6 h-6 mr-3" />
+                    Download Resume
+                  </a>
                 </Button>
               </div>
             </div>
