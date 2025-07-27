@@ -254,6 +254,13 @@ async function main() {
     // Generate HTML
     const html = generateHTML(publishedGames);
 
+    // Generate JSON data for client-side consumption
+    const jsonData = JSON.stringify({
+      games: publishedGames,
+      generated_at: new Date().toISOString(),
+      count: publishedGames.length
+    }, null, 2);
+
     // Ensure output directory exists
     const outputDir = path.join(process.cwd(), 'public');
     if (!fs.existsSync(outputDir)) {
@@ -264,7 +271,12 @@ async function main() {
     const outputPath = path.join(outputDir, 'itch-games.html');
     fs.writeFileSync(outputPath, html, 'utf8');
 
+    // Write JSON file
+    const jsonPath = path.join(outputDir, 'itch-games.json');
+    fs.writeFileSync(jsonPath, jsonData, 'utf8');
+
     console.log(`🎉 Successfully generated: ${outputPath}`);
+    console.log(`📊 Successfully generated: ${jsonPath}`);
     console.log(`📄 ${publishedGames.length} games rendered in HTML`);
 
   } catch (error) {
@@ -275,10 +287,26 @@ async function main() {
       console.log('🔧 Generating fallback HTML for development...');
       
       const fallbackHTML = generateHTML([]);
-      const outputPath = path.join(process.cwd(), 'public', 'itch-games.html');
+      const fallbackJSON = JSON.stringify({
+        games: [],
+        generated_at: new Date().toISOString(),
+        count: 0,
+        error: 'Development mode - no API key'
+      }, null, 2);
+      
+      const outputDir = path.join(process.cwd(), 'public');
+      if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true });
+      }
+      
+      const outputPath = path.join(outputDir, 'itch-games.html');
+      const jsonPath = path.join(outputDir, 'itch-games.json');
+      
       fs.writeFileSync(outputPath, fallbackHTML, 'utf8');
+      fs.writeFileSync(jsonPath, fallbackJSON, 'utf8');
       
       console.log('📄 Fallback HTML generated successfully');
+      console.log('📊 Fallback JSON generated successfully');
     }
     
     process.exit(1);

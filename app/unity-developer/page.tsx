@@ -1,3 +1,5 @@
+"use client"
+
 import { Download, ExternalLink, Linkedin, Mail, Play, Phone, Filter, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Navigation } from "@/components/navigation"
@@ -6,8 +8,22 @@ import { RoleSwitcher } from "@/components/role-switcher"
 import { TableOfContents } from "@/components/table-of-contents"
 import { ProgressIndicator } from "@/components/progress-indicator"
 import { LanguageToggle } from "@/components/language-toggle"
+import { useItchGames } from "@/hooks/use-itch-games"
 
 export default function UnityDeveloperPage() {
+  const { convertToProjects, loading } = useItchGames()
+  
+  interface ProjectType {
+    name: string
+    description: string
+    tech?: string[]
+    metrics: Record<string, string>
+    video: string
+    featured: boolean
+    type: 'static' | 'itch'
+    url?: string
+  }
+  
   const tocItems = [
     { id: "about", title: "About Me", level: 1 },
     { id: "projects", title: "Featured Projects", level: 1 },
@@ -16,7 +32,8 @@ export default function UnityDeveloperPage() {
     { id: "contact", title: "Contact", level: 1 },
   ]
 
-  const projects = [
+  // Combine static projects with Itch.io games
+  const staticProjects: ProjectType[] = [
     {
       name: "Emplayer",
       description:
@@ -26,6 +43,7 @@ export default function UnityDeveloperPage() {
       video:
         "https://img.itch.zone/aW1hZ2UvMTEwNDU3OS82MzczMzY2LnBuZw==/794x1000/sQccdG.png",
       featured: true,
+      type: 'static'
     },
     {
       name: "VR Training Modules",
@@ -35,6 +53,7 @@ export default function UnityDeveloperPage() {
       metrics: { retention: "+15%", cost: "-20%", users: "500+" },
       video: "/placeholder.svg?height=300&width=500",
       featured: true,
+      type: 'static'
     },
     {
       name: "Interactive AR Applications",
@@ -44,6 +63,7 @@ export default function UnityDeveloperPage() {
       metrics: { apps: "20+", engagement: "+48.7%", crashes: "-74.3%" },
       video: "/placeholder.svg?height=300&width=500",
       featured: true,
+      type: 'static'
     },
     {
       name: "Grimoire Games Projects",
@@ -52,6 +72,7 @@ export default function UnityDeveloperPage() {
       metrics: { games: "13+", awards: "Multiple", team: "4-20" },
       video: "/placeholder.svg?height=300&width=500",
       featured: false,
+      type: 'static'
     },
     {
       name: "API-Connected Systems",
@@ -60,8 +81,21 @@ export default function UnityDeveloperPage() {
       metrics: { systems: "10+", uptime: "99.9%", response: "<100ms" },
       video: "/placeholder.svg?height=300&width=500",
       featured: false,
+      type: 'static'
     },
   ]
+
+  // Combine static and Itch.io projects
+  const allProjects: ProjectType[] = [
+    ...staticProjects,
+    ...convertToProjects('unity').map(project => ({
+      ...project,
+      tech: project.tech || []
+    }))
+  ]
+
+  // Show only featured projects
+  const projects = allProjects.filter(project => project.featured)
 
   const experience = [
     {
@@ -244,7 +278,7 @@ export default function UnityDeveloperPage() {
                       </div>
 
                       <div className="flex flex-wrap gap-2 mb-4">
-                        {project.tech.map((tech, techIndex) => (
+                        {project.tech?.map((tech, techIndex) => (
                           <span
                             key={techIndex}
                             className="px-3 py-1 bg-[#232329]/50 text-[#F4F4F5]/80 rounded-full text-sm border border-[#232329]"
@@ -258,8 +292,19 @@ export default function UnityDeveloperPage() {
                         variant="ghost"
                         className="text-[#7EE787] hover:bg-[#7EE787]/10 p-3 h-auto focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#232329]"
                         aria-label={`View ${project.name} project details`}
+                        asChild={!!project.url}
                       >
-                        <ExternalLink className="w-5 h-5" />
+                        {project.url ? (
+                          <a
+                            href={project.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink className="w-5 h-5" />
+                          </a>
+                        ) : (
+                          <ExternalLink className="w-5 h-5" />
+                        )}
                       </Button>
                     </div>
                   </article>

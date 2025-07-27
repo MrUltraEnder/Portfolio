@@ -1,3 +1,5 @@
+"use client"
+
 import { Download, ExternalLink, Linkedin, Mail, Play, Phone, Filter, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Navigation } from "@/components/navigation"
@@ -6,8 +8,22 @@ import { RoleSwitcher } from "@/components/role-switcher"
 import { TableOfContents } from "@/components/table-of-contents"
 import { ProgressIndicator } from "@/components/progress-indicator"
 import { LanguageToggle } from "@/components/language-toggle"
+import { useItchGames } from "@/hooks/use-itch-games"
 
 export default function GameDesignerPage() {
+  const { convertToProjects, loading } = useItchGames()
+  
+  interface ProjectType {
+    name: string
+    description: string
+    focus: string[]
+    metrics: Record<string, string>
+    video: string
+    featured: boolean
+    type: 'static' | 'itch'
+    url?: string
+  }
+  
   const tocItems = [
     { id: "about", title: "About Me", level: 1 },
     { id: "projects", title: "Featured Projects", level: 1 },
@@ -16,7 +32,7 @@ export default function GameDesignerPage() {
     { id: "contact", title: "Contact", level: 1 },
   ]
 
-  const projects = [
+  const staticProjects: ProjectType[] = [
     {
       name: "Emplayer",
       description:
@@ -26,6 +42,7 @@ export default function GameDesignerPage() {
       video:
         "https://img.itch.zone/aW1hZ2UvMTEwNDU3OS82MzczMzY2LnBuZw==/794x1000/sQccdG.png",
       featured: true,
+      type: 'static'
     },
     {
       name: "Quantum Puzzle Mechanics",
@@ -35,6 +52,7 @@ export default function GameDesignerPage() {
       metrics: { complexity: "Multi-dimensional", retention: "+85%", difficulty: "Adaptive" },
       video: "/placeholder.svg?height=300&width=500",
       featured: true,
+      type: 'static'
     },
     {
       name: "Narrative Branching System",
@@ -43,6 +61,7 @@ export default function GameDesignerPage() {
       metrics: { branches: "50+", outcomes: "Dynamic", agency: "High" },
       video: "/placeholder.svg?height=300&width=500",
       featured: true,
+      type: 'static'
     },
     {
       name: "Cooperative Strategy Game",
@@ -51,6 +70,7 @@ export default function GameDesignerPage() {
       metrics: { players: "2-8", balance: "Asymmetric", communication: "Essential" },
       video: "/placeholder.svg?height=300&width=500",
       featured: false,
+      type: 'static'
     },
     {
       name: "Accessibility-First Platformer",
@@ -59,8 +79,24 @@ export default function GameDesignerPage() {
       metrics: { accessibility: "WCAG 2.1", inputs: "Multiple", customization: "Full" },
       video: "/placeholder.svg?height=300&width=500",
       featured: false,
+      type: 'static'
     },
   ]
+
+  // Convert Itch.io games to game designer format
+  const itchProjects: ProjectType[] = convertToProjects('designer').map(project => ({
+    ...project,
+    focus: project.focus || []
+  }))
+
+  // Combine static and Itch.io projects
+  const allProjects: ProjectType[] = [
+    ...staticProjects,
+    ...itchProjects
+  ]
+
+  // Show only featured projects
+  const projects = allProjects.filter(project => project.featured)
 
   const experience = [
     {
@@ -256,8 +292,19 @@ export default function GameDesignerPage() {
                         variant="ghost"
                         className="text-[#A970FF] hover:bg-[#A970FF]/10 p-3 h-auto focus:ring-2 focus:ring-[#A970FF] focus:ring-offset-2 focus:ring-offset-[#232329]"
                         aria-label={`View ${project.name} project details`}
+                        asChild={!!project.url}
                       >
-                        <ExternalLink className="w-5 h-5" />
+                        {project.url ? (
+                          <a
+                            href={project.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink className="w-5 h-5" />
+                          </a>
+                        ) : (
+                          <ExternalLink className="w-5 h-5" />
+                        )}
                       </Button>
                     </div>
                   </article>
