@@ -5,6 +5,7 @@ import { BreadcrumbNav } from "@/components/breadcrumb-nav"
 import { RoleSwitcher } from "@/components/role-switcher"
 import { TableOfContents } from "@/components/table-of-contents"
 import { ProgressIndicator } from "@/components/progress-indicator"
+import { LanguageToggle } from "@/components/language-toggle"
 
 export default function GameDesignerPage() {
   const tocItems = [
@@ -118,6 +119,7 @@ export default function GameDesignerPage() {
       <Navigation />
       <RoleSwitcher />
       <TableOfContents items={tocItems} />
+      <LanguageToggle />
 
       {/* Background effects */}
       <div className="fixed inset-0 opacity-10">
