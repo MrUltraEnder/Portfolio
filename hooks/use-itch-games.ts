@@ -8,6 +8,8 @@ interface ItchGame {
   cover_url: string
   url: string
   published_at: string
+  platforms?: string[]
+  primary_platform?: string
 }
 
 export interface Project {
@@ -103,7 +105,7 @@ export function useItchGames() {
         name: game.title,
         description: game.short_text || 'Interactive game developed with Unity',
         tech: role === 'unity' 
-          ? ['Unity', 'C#', 'WebGL', 'Game Development']
+          ? ['Unity', 'C#', game.primary_platform || 'WebGL', 'Game Development']
           : undefined,
         focus: role === 'designer'
           ? ['Game Design', 'Player Experience', 'Interactive Systems', 'Gameplay Mechanics']
@@ -119,7 +121,7 @@ export function useItchGames() {
         url: game.url,
         type: 'itch' as const,
         published_date: game.published_at,
-        platform: 'Itch.io'
+        platform: game.primary_platform || 'WebGL'
       }
     })
   }

@@ -192,14 +192,14 @@ export default function GameDesignerPage() {
                   projects.map((project, index) => (
                     <article
                       key={index}
-                      className="project-card bg-[#232329]/30 backdrop-blur-sm rounded-2xl overflow-hidden border border-[#232329] hover:border-[#A970FF]/30 transition-all duration-500 group focus-within:ring-2 focus-within:ring-[#A970FF] focus-within:ring-offset-2 focus-within:ring-offset-[#0e0e10]"
+                      className="project-card bg-[#232329]/30 backdrop-blur-sm rounded-2xl overflow-hidden border border-[#232329] hover:border-[#A970FF]/30 transition-all duration-500 group"
                     >
                       {project.url ? (
                         <a
                           href={project.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="block h-full"
+                          className="block h-full hover:scale-[1.02] transition-transform duration-300 focus:outline-none focus:ring-2 focus:ring-[#A970FF] focus:ring-offset-2 focus:ring-offset-[#0e0e10] rounded-2xl cursor-pointer"
                         >
                           <ProjectContent project={project} />
                         </a>
@@ -365,9 +365,9 @@ function ProjectContent({ project }: { project: Project }) {
         </div>
 
         <div className="flex items-center justify-between">
-          <div className="flex items-center text-[#A970FF]/80 text-sm">
-            <ExternalLink className="w-4 h-4 mr-2" />
-            <span>Play on Itch.io</span>
+          <div className="flex items-center text-[#A970FF]/80 text-sm font-medium">
+            <ExternalLink className="w-4 h-4 mr-2 group-hover:text-[#A970FF] transition-colors" />
+            <span className="group-hover:text-[#A970FF] transition-colors">Click to play on Itch.io</span>
           </div>
           <div className="text-[#F4F4F5]/60 text-xs">
             {project.platform}

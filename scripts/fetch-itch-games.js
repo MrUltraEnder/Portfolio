@@ -235,13 +235,32 @@ async function main() {
     // Filter only published games and extract needed data
     const publishedGames = response.games
       .filter(game => game.published && game.published_at)
-      .map(game => ({
-        title: game.title,
-        short_text: game.short_text,
-        cover_url: game.cover_url,
-        url: game.url,
-        published_at: game.published_at
-      }))
+      .map(game => {
+        // Extract platform information
+        let platforms = [];
+        if (game.platforms) {
+          if (game.platforms.windows) platforms.push('Windows');
+          if (game.platforms.osx) platforms.push('macOS');
+          if (game.platforms.linux) platforms.push('Linux');
+          if (game.platforms.android) platforms.push('Android');
+          if (game.platforms.web) platforms.push('WebGL');
+        }
+        
+        // Default to WebGL if no platforms specified
+        if (platforms.length === 0) {
+          platforms = ['WebGL'];
+        }
+        
+        return {
+          title: game.title,
+          short_text: game.short_text,
+          cover_url: game.cover_url,
+          url: game.url,
+          published_at: game.published_at,
+          platforms: platforms,
+          primary_platform: platforms[0] || 'WebGL'
+        }
+      })
       .sort((a, b) => new Date(b.published_at) - new Date(a.published_at)); // Sort by newest first
 
     console.log(`✅ Found ${publishedGames.length} published games`);
