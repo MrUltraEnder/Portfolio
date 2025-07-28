@@ -179,9 +179,43 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
            /^[\w\-\.]+@[\w\-\.]+\.\w+$/.test(text) || // email
            /^https?:\/\//.test(text) || // URLs
            /^[A-Z]{2,3}$/.test(text) || // Language codes like EN, ES
-            text === 'C' || // Skip single letter "C" (programming language)
-            text === 'Windows' || // Skip Windows operating system
-            text === 'C#' // Skip C# programming language
+           text === 'C' || // Skip single letter "C" (programming language)
+           text === 'Windows' || // Skip Windows operating system
+           text === 'C#' || // Skip C# programming language
+           text === 'Live' || // Skip Live (as in Live Demo)
+           text === 'Unity' || // Skip Unity game engine
+           text === 'JavaScript' || // Skip JavaScript
+           text === 'TypeScript' || // Skip TypeScript
+           text === 'React' || // Skip React
+           text === 'Next.js' || // Skip Next.js
+           text === 'WebGL' || // Skip WebGL
+           text === 'HTML' || // Skip HTML
+           text === 'CSS' || // Skip CSS
+           text === 'API' || // Skip API
+           text === 'Git' || // Skip Git
+           text === 'GitHub' || // Skip GitHub
+           text === 'Steam' || // Skip Steam
+           text === 'Itch.io' || // Skip Itch.io
+           text === 'VR' || // Skip VR
+           text === 'AR' || // Skip AR
+           text === 'XR' || // Skip XR
+           text === 'iOS' || // Skip iOS
+           text === 'Android' || // Skip Android
+           text === 'macOS' || // Skip macOS
+           text === 'Linux' || // Skip Linux
+           text === 'PlayStation' || // Skip PlayStation
+           text === 'Xbox' || // Skip Xbox
+           text.includes('🌐') || // Skip text with web emoji
+           text.includes('🎮') || // Skip text with game emoji
+           text.includes('💻') || // Skip text with computer emoji
+           text.includes('📱') || // Skip text with mobile emoji
+           text.includes('🖥️') || // Skip text with desktop emoji
+           text.includes('⚡') || // Skip text with lightning emoji
+           text.includes('🚀') || // Skip text with rocket emoji
+           text.includes('🎯') || // Skip text with target emoji
+           text.includes('🔧') || // Skip text with wrench emoji
+           text.includes('⭐') || // Skip text with star emoji
+           text.includes('🏆') // Skip text with trophy emoji
   }
 
   return (
