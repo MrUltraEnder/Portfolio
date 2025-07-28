@@ -236,20 +236,41 @@ async function main() {
     const publishedGames = response.games
       .filter(game => game.published && game.published_at)
       .map(game => {
-        // Extract platform information
+        // Extract platform information correctly from Itch.io API
         let platforms = [];
-        if (game.platforms) {
-          if (game.platforms.windows) platforms.push('Windows');
-          if (game.platforms.osx) platforms.push('macOS');
-          if (game.platforms.linux) platforms.push('Linux');
-          if (game.platforms.android) platforms.push('Android');
-          if (game.platforms.web) platforms.push('WebGL');
-        }
+        const platformsObj = game.platforms || {};
+        
+        // Check each platform property and add to array if true
+        Object.keys(platformsObj).forEach(platform => {
+          if (platformsObj[platform] === true) {
+            switch(platform) {
+              case 'windows':
+                platforms.push('Windows');
+                break;
+              case 'osx':
+                platforms.push('macOS');
+                break;
+              case 'linux':
+                platforms.push('Linux');
+                break;
+              case 'android':
+                platforms.push('Android');
+                break;
+              case 'web':
+                platforms.push('WebGL');
+                break;
+              default:
+                platforms.push(platform.charAt(0).toUpperCase() + platform.slice(1));
+            }
+          }
+        });
         
         // Default to WebGL if no platforms specified
         if (platforms.length === 0) {
           platforms = ['WebGL'];
         }
+        
+        console.log(`${game.title} platforms:`, platformsObj, '-> processed:', platforms);
         
         return {
           title: game.title,

@@ -35,9 +35,20 @@
         "Android"
       ],
       "primary_platform": "Windows"
+    },
+    {
+      "title": "Mobile Racing Game",
+      "short_text": "Fast-paced racing action optimized for mobile devices.",
+      "cover_url": "/placeholder.svg",
+      "url": "https://ericzaleta.itch.io/mobile-racing-game",
+      "published_at": "2023-11-05T16:20:00.000Z",
+      "platforms": [
+        "Android"
+      ],
+      "primary_platform": "Android"
     }
   ],
   "generated_at": "2025-07-27T23:04:02.553Z",
-  "count": 3,
+  "count": 4,
   "error": null
 }
