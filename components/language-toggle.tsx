@@ -12,49 +12,92 @@ interface LanguageToggleProps {
 export function LanguageToggle({ className = "" }: LanguageToggleProps) {
   const [currentLang, setCurrentLang] = useState<'en' | 'es'>('en')
   const [isTranslating, setIsTranslating] = useState(false)
+  const [isInitializing, setIsInitializing] = useState(true)
   const { toast } = useToast()
 
+  // Words that should never be translated
+  const PROTECTED_WORDS = [
+    'C#', 'JavaScript', 'TypeScript', 'React', 'Next.js', 'Unity', 'WebGL',
+    'HTML', 'CSS', 'API', 'REST', 'JSON', 'Git', 'GitHub', 'VS Code',
+    'Node.js', 'npm', 'pnpm', 'MongoDB', 'SQL', 'NoSQL', 'AWS', 'Docker',
+    'Kubernetes', 'DevOps', 'CI/CD', 'OAuth', 'JWT', 'HTTPS', 'HTTP',
+    'Eric Zaleta', 'Portfolio', 'VR', 'AR', 'XR', 'iOS', 'Android',
+    'Windows', 'macOS', 'Linux', 'Steam', 'Itch.io', 'PlayStation', 'Xbox'
+  ]
+
   useEffect(() => {
-    // Restore saved language state from localStorage
-    const savedLang = localStorage.getItem('portfolio-language') as 'en' | 'es' | null
-    const isTranslated = document.documentElement.getAttribute('data-translated')
-    
-    if (savedLang) {
-      setCurrentLang(savedLang)
-      
-      // If we have a saved Spanish state but page is not translated, translate it
-      if (savedLang === 'es' && isTranslated !== 'true') {
-        translateToSpanish()
-      }
-    } else if (isTranslated === 'true') {
-      // Legacy check: if page was translated but no saved state, set to Spanish
-      setCurrentLang('es')
-      localStorage.setItem('portfolio-language', 'es')
-    } else {
-      // Detect current page language automatically
-      detectAndSetLanguage()
-    }
+    initializeLanguage()
   }, [])
 
-  const detectAndSetLanguage = async () => {
+  const initializeLanguage = async () => {
+    setIsInitializing(true)
+    
+    try {
+      // Restore saved language state from localStorage
+      const savedLang = localStorage.getItem('portfolio-language') as 'en' | 'es' | null
+      const isTranslated = document.documentElement.getAttribute('data-translated')
+      
+      if (savedLang) {
+        setCurrentLang(savedLang)
+        
+        // If we have a saved Spanish state but page is not translated, translate it
+        if (savedLang === 'es' && isTranslated !== 'true') {
+          await translateToSpanish()
+        } else if (savedLang === 'en' && isTranslated === 'true') {
+          // If saved as English but page is marked as translated, translate back to English
+          await translateToEnglish()
+        }
+      } else {
+        // First time load: detect current language and normalize to English
+        const detectedLang = await detectPageLanguage()
+        
+        if (detectedLang === 'es') {
+          // Page has Spanish content, translate to English as default
+          await translateToEnglish()
+          setCurrentLang('en')
+          localStorage.setItem('portfolio-language', 'en')
+          document.documentElement.removeAttribute('data-translated')
+          
+          toast({
+            title: "Content normalized",
+            description: "Page content has been standardized to English.",
+          })
+        } else {
+          // Page is already in English
+          setCurrentLang('en')
+          localStorage.setItem('portfolio-language', 'en')
+          document.documentElement.removeAttribute('data-translated')
+        }
+      }
+    } catch (error) {
+      console.warn('Language initialization failed:', error)
+      // Default to English if initialization fails
+      setCurrentLang('en')
+      localStorage.setItem('portfolio-language', 'en')
+    } finally {
+      setIsInitializing(false)
+    }
+  }
+
+  const detectPageLanguage = async (): Promise<'en' | 'es'> => {
     try {
       // Sample some text from the page to detect language
       const textNodes = getTextNodes(document.body)
       const sampleTexts: string[] = []
       
       // Get first few meaningful text samples
-      textNodes.slice(0, 10).forEach(node => {
+      textNodes.slice(0, 15).forEach(node => {
         const text = node.textContent?.trim()
-        if (text && text.length > 10 && !isNumericOrSymbol(text)) {
+        if (text && text.length > 10 && !isNumericOrSymbol(text) && !isProtectedWord(text)) {
           sampleTexts.push(text)
         }
       })
 
-      if (sampleTexts.length === 0) return
+      if (sampleTexts.length === 0) return 'en'
 
       // Use Google Translate API to detect language
       const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_TRANSLATE_API_KEY
-      if (!API_KEY) return
+      if (!API_KEY) return 'en'
 
       const response = await fetch(
         `https://translation.googleapis.com/language/translate/v2/detect?key=${API_KEY}`,
@@ -64,31 +107,36 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            q: sampleTexts.slice(0, 3) // Check first 3 samples
+            q: sampleTexts.slice(0, 5) // Check first 5 samples
           }),
         }
       )
 
       if (response.ok) {
         const data = await response.json()
-        if (data.data && data.data.detections && data.data.detections[0]) {
-          const detectedLang = data.data.detections[0][0]?.language
+        if (data.data && data.data.detections) {
+          // Check if majority of samples are detected as Spanish
+          const spanishDetections = data.data.detections.filter((detection: any) => 
+            detection[0]?.language === 'es' && detection[0]?.confidence > 0.7
+          )
           
-          if (detectedLang === 'es') {
-            setCurrentLang('es')
-            localStorage.setItem('portfolio-language', 'es')
-            document.documentElement.setAttribute('data-translated', 'true')
-          } else {
-            setCurrentLang('en')
-            localStorage.setItem('portfolio-language', 'en')
+          if (spanishDetections.length > data.data.detections.length / 2) {
+            return 'es'
           }
         }
       }
+      return 'en'
     } catch (error) {
       console.warn('Language detection failed:', error)
-      // Default to English if detection fails
-      setCurrentLang('en')
-      localStorage.setItem('portfolio-language', 'en')
+      return 'en'
+    }
+  }
+
+  const translateToEnglish = async () => {
+    try {
+      await translateAllContent('es', 'en')
+    } catch (error) {
+      console.error('Auto-translation to English failed:', error)
     }
   }
 
@@ -99,8 +147,15 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
       localStorage.setItem('portfolio-language', 'es')
       document.documentElement.setAttribute('data-translated', 'true')
     } catch (error) {
-      console.error('Auto-translation failed:', error)
+      console.error('Auto-translation to Spanish failed:', error)
     }
+  }
+
+  const isProtectedWord = (text: string): boolean => {
+    return PROTECTED_WORDS.some(word => 
+      text.toLowerCase().includes(word.toLowerCase()) ||
+      word.toLowerCase().includes(text.toLowerCase())
+    )
   }
 
   const translatePage = async () => {
@@ -212,12 +267,18 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
     // Get all text nodes from the page
     const textNodes = getTextNodes(document.body)
     const textsToTranslate: string[] = []
+    const protectedTextMap = new Map<string, string>()
     
     // Filter out empty or very short texts and collect unique texts
     textNodes.forEach(node => {
       const text = node.textContent?.trim()
       if (text && text.length > 1 && !isNumericOrSymbol(text)) {
-        textsToTranslate.push(text)
+        // Protect specific words before translation
+        const protectedText = protectWords(text)
+        textsToTranslate.push(protectedText.text)
+        if (protectedText.hasProtectedWords) {
+          protectedTextMap.set(protectedText.text, text) // Store original
+        }
       }
     })
 
@@ -236,7 +297,7 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
       }
       
       // Translate texts in batches
-      const batchSize = 20
+      const batchSize = 15 // Reduced batch size for better handling
       const translations: { [key: string]: string } = {}
       
       for (let i = 0; i < uniqueTexts.length; i += batchSize) {
@@ -273,16 +334,30 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
         
         if (data.data && data.data.translations) {
           data.data.translations.forEach((translation: any, index: number) => {
-            translations[batch[index]] = translation.translatedText
+            const originalText = batch[index]
+            let translatedText = translation.translatedText
+            
+            // Restore protected words
+            translatedText = restoreProtectedWords(translatedText)
+            
+            translations[originalText] = translatedText
           })
+        }
+        
+        // Small delay between batches to avoid rate limiting
+        if (i + batchSize < uniqueTexts.length) {
+          await new Promise(resolve => setTimeout(resolve, 100))
         }
       }
 
       // Apply translations to the page
       textNodes.forEach(node => {
         const originalText = node.textContent?.trim()
-        if (originalText && translations[originalText]) {
-          node.textContent = translations[originalText]
+        if (originalText) {
+          const protectedOriginal = protectWords(originalText)
+          if (translations[protectedOriginal.text]) {
+            node.textContent = translations[protectedOriginal.text]
+          }
         }
       })
 
@@ -290,6 +365,35 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
       console.error('Translation error:', error)
       throw error
     }
+  }
+
+  const protectWords = (text: string): { text: string; hasProtectedWords: boolean } => {
+    let protectedText = text
+    let hasProtectedWords = false
+    
+    PROTECTED_WORDS.forEach((word, index) => {
+      const placeholder = `__PROTECTED_${index}__`
+      const regex = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi')
+      
+      if (regex.test(protectedText)) {
+        protectedText = protectedText.replace(regex, placeholder)
+        hasProtectedWords = true
+      }
+    })
+    
+    return { text: protectedText, hasProtectedWords }
+  }
+
+  const restoreProtectedWords = (text: string): string => {
+    let restoredText = text
+    
+    PROTECTED_WORDS.forEach((word, index) => {
+      const placeholder = `__PROTECTED_${index}__`
+      const regex = new RegExp(placeholder, 'gi')
+      restoredText = restoredText.replace(regex, word)
+    })
+    
+    return restoredText
   }
 
   const getTextNodes = (element: Element): Text[] => {
@@ -330,7 +434,7 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
     <div className={`${className.includes('static') ? '' : 'fixed top-4 left-4 z-50'} ${className}`}>
       <Button
         onClick={translatePage}
-        disabled={isTranslating}
+        disabled={isTranslating || isInitializing}
         variant="outline"
         size="sm"
         className={`language-toggle bg-[#232329]/80 backdrop-blur-sm border-[#7EE787]/20 text-[#F4F4F5] hover:bg-[#7EE787]/10 hover:border-[#7EE787]/40 transition-all duration-200 ${
@@ -339,12 +443,12 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
           className.includes('h-8') ? 'h-8 px-2 md:px-3 lg:px-4 py-1.5 text-xs md:text-sm' : ''
         }`}
       >
-        {isTranslating ? (
+        {isTranslating || isInitializing ? (
           <Loader2 className="w-4 h-4 mr-1 md:mr-1.5 animate-spin" />
         ) : (
           <Globe className="w-4 h-4 mr-1 md:mr-1.5" />
         )}
-        {currentLang.toUpperCase()}
+        {isInitializing ? 'INIT' : currentLang.toUpperCase()}
       </Button>
     </div>
   )
