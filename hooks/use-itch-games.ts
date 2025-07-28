@@ -39,7 +39,13 @@ export function useItchGames() {
         const jsonResponse = await fetch('/Portfolio/itch-games.json')
         if (jsonResponse.ok) {
           const data = await jsonResponse.json()
-          setItchGames(data.games || [])
+          // Ensure the games have the correct structure including platforms
+          const gamesWithPlatforms = (data.games || []).map((game: any) => ({
+            ...game,
+            platforms: game.platforms || ['WebGL'],
+            primary_platform: game.primary_platform || game.platforms?.[0] || 'WebGL'
+          }))
+          setItchGames(gamesWithPlatforms)
           return
         }
 
@@ -100,6 +106,9 @@ export function useItchGames() {
         year: 'numeric', 
         month: 'short' 
       })
+      
+      // Debug: log platform data
+      console.log('Game:', game.title, 'Primary Platform:', game.primary_platform, 'Platforms:', game.platforms)
       
       return {
         name: game.title,
