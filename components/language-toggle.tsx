@@ -186,12 +186,16 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
         disabled={isTranslating}
         variant="outline"
         size="sm"
-        className="language-toggle bg-[#232329]/80 backdrop-blur-sm border-[#7EE787]/20 text-[#F4F4F5] hover:bg-[#7EE787]/10 hover:border-[#7EE787]/40 transition-all duration-200 w-full"
+        className={`language-toggle bg-[#232329]/80 backdrop-blur-sm border-[#7EE787]/20 text-[#F4F4F5] hover:bg-[#7EE787]/10 hover:border-[#7EE787]/40 transition-all duration-200 ${
+          className.includes('w-full') ? 'w-full' : ''
+        } ${
+          className.includes('h-8') ? 'h-8 px-2 md:px-3 lg:px-4 py-1.5 text-xs md:text-sm' : ''
+        }`}
       >
         {isTranslating ? (
-          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          <Loader2 className="w-4 h-4 mr-1 md:mr-1.5 animate-spin" />
         ) : (
-          <Globe className="w-4 h-4 mr-2" />
+          <Globe className="w-4 h-4 mr-1 md:mr-1.5" />
         )}
         {currentLang.toUpperCase()}
       </Button>

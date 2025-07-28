@@ -54,7 +54,7 @@ export function Navigation() {
             <div className="flex justify-start">
               <Link
                 href="/"
-                className="text-xl font-bold bg-gradient-to-r from-[#7EE787] to-[#A970FF] bg-clip-text text-transparent hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10] rounded-md px-2 py-1"
+                className="text-xl font-bold bg-gradient-to-r from-[#7EE787] to-[#A970FF] bg-clip-text text-transparent hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10] rounded-md px-3 py-1.5 h-8 flex items-center"
                 aria-label="Eric Zaleta - Home"
               >
                 Eric Zaleta
@@ -62,21 +62,21 @@ export function Navigation() {
             </div>
 
             {/* Desktop Menu - Centered */}
-            <div className="hidden md:flex items-center justify-center space-x-4">
+            <div className="hidden md:flex items-center justify-center space-x-2 lg:space-x-4">
               {navItems.map((item) => {
                 const Icon = item.icon
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center px-6 py-1 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10] ${
+                    className={`flex items-center px-3 md:px-4 lg:px-6 xl:px-8 py-1.5 h-8 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10] whitespace-nowrap ${
                       isActive(item.href)
                         ? "bg-[#7EE787]/20 text-[#7EE787] border border-[#7EE787]/30"
                         : "text-[#F4F4F5]/80 hover:text-[#7EE787] hover:bg-[#7EE787]/10"
                     }`}
                     aria-current={isActive(item.href) ? "page" : undefined}
                   >
-                    <Icon className="w-4 h-4 mr-2" />
+                    <Icon className="w-4 h-4 mr-1.5" />
                     {item.label}
                   </Link>
                 )
@@ -84,23 +84,36 @@ export function Navigation() {
             </div>
 
             {/* Action Buttons */}
-            <div className="hidden md:flex items-center justify-end space-x-3">
+            <div className="hidden md:flex items-center justify-end space-x-1 lg:space-x-2">
               <Button
                 variant="outline"
                 size="sm"
-                className="border-[#7EE787]/30 text-[#7EE787] hover:bg-[#7EE787]/10 bg-transparent"
+                className="border-[#7EE787]/30 text-[#7EE787] hover:bg-[#7EE787]/10 bg-transparent px-2 md:px-3 lg:px-4 py-1.5 h-8 text-xs md:text-sm"
                 asChild
               >
                 <a href="mailto:ericzaleta@gmail.com">
-                  <Mail className="w-4 h-4 mr-2" />
-                  Contact
+                  <Mail className="w-4 h-4 mr-1 md:mr-1.5" />
+                  <span className="hidden lg:inline">Contact</span>
+                  <span className="lg:hidden">Contact</span>
                 </a>
               </Button>
-              <Button size="sm" className="bg-[#7EE787] text-[#0e0e10] hover:bg-[#7EE787]/90">
-                <Download className="w-4 h-4 mr-2" />
-                Resume
+              <Button 
+                size="sm" 
+                className="bg-[#7EE787] text-[#0e0e10] hover:bg-[#7EE787]/90 px-2 md:px-3 lg:px-4 py-1.5 h-8 text-xs md:text-sm"
+                asChild
+              >
+                <a
+                  href="/Portfolio/Eric-Zaleta-Unity-Developer-Resume.pdf"
+                  download="Eric-Zaleta-Unity-Developer-Resume.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Download className="w-4 h-4 mr-1 md:mr-1.5" />
+                  <span className="hidden lg:inline">Resume</span>
+                  <span className="lg:hidden">CV</span>
+                </a>
               </Button>
-              <LanguageToggle className="static" />
+              <LanguageToggle className="static h-8" />
             </div>
 
             {/* Mobile Menu Button - Only visible on mobile */}
