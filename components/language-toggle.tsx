@@ -179,8 +179,9 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
            /^[\w\-\.]+@[\w\-\.]+\.\w+$/.test(text) || // email
            /^https?:\/\//.test(text) || // URLs
            /^[A-Z]{2,3}$/.test(text) || // Language codes like EN, ES
-      text === 'C' // Skip single letter "C" (programming language)
-    text === 'Windows' // Skip C# programming language
+            text === 'C' || // Skip single letter "C" (programming language)
+            text === 'Windows' || // Skip Windows operating system
+            text === 'C#' // Skip C# programming language
   }
 
   return (
