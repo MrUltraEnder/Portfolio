@@ -15,12 +15,93 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
   const { toast } = useToast()
 
   useEffect(() => {
-    // Check if page was already translated
+    // Restore saved language state from localStorage
+    const savedLang = localStorage.getItem('portfolio-language') as 'en' | 'es' | null
     const isTranslated = document.documentElement.getAttribute('data-translated')
-    if (isTranslated === 'true') {
+    
+    if (savedLang) {
+      setCurrentLang(savedLang)
+      
+      // If we have a saved Spanish state but page is not translated, translate it
+      if (savedLang === 'es' && isTranslated !== 'true') {
+        translateToSpanish()
+      }
+    } else if (isTranslated === 'true') {
+      // Legacy check: if page was translated but no saved state, set to Spanish
       setCurrentLang('es')
+      localStorage.setItem('portfolio-language', 'es')
+    } else {
+      // Detect current page language automatically
+      detectAndSetLanguage()
     }
   }, [])
+
+  const detectAndSetLanguage = async () => {
+    try {
+      // Sample some text from the page to detect language
+      const textNodes = getTextNodes(document.body)
+      const sampleTexts: string[] = []
+      
+      // Get first few meaningful text samples
+      textNodes.slice(0, 10).forEach(node => {
+        const text = node.textContent?.trim()
+        if (text && text.length > 10 && !isNumericOrSymbol(text)) {
+          sampleTexts.push(text)
+        }
+      })
+
+      if (sampleTexts.length === 0) return
+
+      // Use Google Translate API to detect language
+      const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_TRANSLATE_API_KEY
+      if (!API_KEY) return
+
+      const response = await fetch(
+        `https://translation.googleapis.com/language/translate/v2/detect?key=${API_KEY}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            q: sampleTexts.slice(0, 3) // Check first 3 samples
+          }),
+        }
+      )
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.data && data.data.detections && data.data.detections[0]) {
+          const detectedLang = data.data.detections[0][0]?.language
+          
+          if (detectedLang === 'es') {
+            setCurrentLang('es')
+            localStorage.setItem('portfolio-language', 'es')
+            document.documentElement.setAttribute('data-translated', 'true')
+          } else {
+            setCurrentLang('en')
+            localStorage.setItem('portfolio-language', 'en')
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Language detection failed:', error)
+      // Default to English if detection fails
+      setCurrentLang('en')
+      localStorage.setItem('portfolio-language', 'en')
+    }
+  }
+
+  const translateToSpanish = async () => {
+    try {
+      await translateAllContent('en', 'es')
+      setCurrentLang('es')
+      localStorage.setItem('portfolio-language', 'es')
+      document.documentElement.setAttribute('data-translated', 'true')
+    } catch (error) {
+      console.error('Auto-translation failed:', error)
+    }
+  }
 
   const translatePage = async () => {
     setIsTranslating(true)
@@ -30,14 +111,31 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
         // Translate to Spanish
         await translateAllContent('en', 'es')
         setCurrentLang('es')
+        localStorage.setItem('portfolio-language', 'es')
         document.documentElement.setAttribute('data-translated', 'true')
         toast({
           title: "Traducción completada",
           description: "La página ha sido traducida al español.",
         })
       } else {
-        // Reload page to reset to English
-        window.location.reload()
+        // Translate back to English or reload page
+        const currentContent = getPageTextContent()
+        
+        // Check if content appears to be in Spanish
+        if (await isContentInSpanish(currentContent)) {
+          await translateAllContent('es', 'en')
+          setCurrentLang('en')
+          localStorage.setItem('portfolio-language', 'en')
+          document.documentElement.removeAttribute('data-translated')
+          toast({
+            title: "Translation completed",
+            description: "Page has been translated to English.",
+          })
+        } else {
+          // Content is already in English, just reload to be safe
+          localStorage.setItem('portfolio-language', 'en')
+          window.location.reload()
+        }
       }
     } catch (error: any) {
       console.error('Translation error:', error)
@@ -58,6 +156,55 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
       }
     } finally {
       setIsTranslating(false)
+    }
+  }
+
+  const getPageTextContent = (): string[] => {
+    const textNodes = getTextNodes(document.body)
+    const texts: string[] = []
+    
+    textNodes.forEach(node => {
+      const text = node.textContent?.trim()
+      if (text && text.length > 10 && !isNumericOrSymbol(text)) {
+        texts.push(text)
+      }
+    })
+    
+    return texts.slice(0, 5) // Sample first 5 meaningful texts
+  }
+
+  const isContentInSpanish = async (textSamples: string[]): Promise<boolean> => {
+    try {
+      const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_TRANSLATE_API_KEY
+      if (!API_KEY || textSamples.length === 0) return false
+
+      const response = await fetch(
+        `https://translation.googleapis.com/language/translate/v2/detect?key=${API_KEY}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            q: textSamples.slice(0, 3)
+          }),
+        }
+      )
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.data && data.data.detections) {
+          // Check if majority of samples are detected as Spanish
+          const spanishDetections = data.data.detections.filter((detection: any) => 
+            detection[0]?.language === 'es' && detection[0]?.confidence > 0.5
+          )
+          return spanishDetections.length > data.data.detections.length / 2
+        }
+      }
+      return false
+    } catch (error) {
+      console.warn('Language detection failed:', error)
+      return false
     }
   }
 
