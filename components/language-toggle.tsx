@@ -22,7 +22,7 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
     'Node.js', 'npm', 'pnpm', 'MongoDB', 'SQL', 'NoSQL', 'AWS', 'Docker',
     'Kubernetes', 'DevOps', 'CI/CD', 'OAuth', 'JWT', 'HTTPS', 'HTTP',
     'Eric Zaleta', 'Portfolio', 'VR', 'AR', 'XR', 'iOS', 'Android',
-    'Windows', 'macOS', 'Linux', 'Steam', 'Itch.io', 'PlayStation', 'Xbox'
+    'Windows', 'macOS', 'Linux', 'Steam', 'Itch.io', 'PlayStation', 'Xbox', 'C'
   ]
 
   useEffect(() => {
@@ -267,7 +267,7 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
     // Get all text nodes from the page
     const textNodes = getTextNodes(document.body)
     const textsToTranslate: string[] = []
-    const protectedTextMap = new Map<string, string>()
+    const originalTextsMap = new Map<string, string>()
     
     // Filter out empty or very short texts and collect unique texts
     textNodes.forEach(node => {
@@ -275,10 +275,8 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
       if (text && text.length > 1 && !isNumericOrSymbol(text)) {
         // Protect specific words before translation
         const protectedText = protectWords(text)
-        textsToTranslate.push(protectedText.text)
-        if (protectedText.hasProtectedWords) {
-          protectedTextMap.set(protectedText.text, text) // Store original
-        }
+        textsToTranslate.push(protectedText)
+        originalTextsMap.set(protectedText, text) // Store mapping
       }
     })
 
@@ -334,13 +332,13 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
         
         if (data.data && data.data.translations) {
           data.data.translations.forEach((translation: any, index: number) => {
-            const originalText = batch[index]
+            const protectedOriginal = batch[index]
             let translatedText = translation.translatedText
             
             // Restore protected words
             translatedText = restoreProtectedWords(translatedText)
             
-            translations[originalText] = translatedText
+            translations[protectedOriginal] = translatedText
           })
         }
         
@@ -355,8 +353,8 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
         const originalText = node.textContent?.trim()
         if (originalText) {
           const protectedOriginal = protectWords(originalText)
-          if (translations[protectedOriginal.text]) {
-            node.textContent = translations[protectedOriginal.text]
+          if (translations[protectedOriginal]) {
+            node.textContent = translations[protectedOriginal]
           }
         }
       })
@@ -367,21 +365,17 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
     }
   }
 
-  const protectWords = (text: string): { text: string; hasProtectedWords: boolean } => {
+  const protectWords = (text: string): string => {
     let protectedText = text
-    let hasProtectedWords = false
     
     PROTECTED_WORDS.forEach((word, index) => {
       const placeholder = `__PROTECTED_${index}__`
+      // Create case-insensitive regex that matches whole words
       const regex = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi')
-      
-      if (regex.test(protectedText)) {
-        protectedText = protectedText.replace(regex, placeholder)
-        hasProtectedWords = true
-      }
+      protectedText = protectedText.replace(regex, placeholder)
     })
     
-    return { text: protectedText, hasProtectedWords }
+    return protectedText
   }
 
   const restoreProtectedWords = (text: string): string => {
@@ -389,6 +383,7 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
     
     PROTECTED_WORDS.forEach((word, index) => {
       const placeholder = `__PROTECTED_${index}__`
+      // Replace all instances of the placeholder with the original word
       const regex = new RegExp(placeholder, 'gi')
       restoredText = restoredText.replace(regex, word)
     })
