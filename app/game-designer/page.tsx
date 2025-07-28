@@ -192,20 +192,25 @@ export default function GameDesignerPage() {
                   projects.map((project, index) => (
                     <article
                       key={index}
-                      className="project-card bg-[#232329]/30 backdrop-blur-sm rounded-2xl overflow-hidden border border-[#232329] hover:border-[#A970FF]/30 transition-all duration-500 group"
+                      className="project-card bg-[#232329]/30 backdrop-blur-sm rounded-2xl overflow-hidden border border-[#232329] hover:border-[#A970FF]/30 transition-all duration-500 group cursor-pointer hover:scale-[1.02] hover:shadow-xl hover:shadow-[#A970FF]/10"
+                      onClick={() => {
+                        if (project.url) {
+                          window.open(project.url, '_blank', 'noopener,noreferrer');
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          if (project.url) {
+                            window.open(project.url, '_blank', 'noopener,noreferrer');
+                          }
+                        }
+                      }}
+                      tabIndex={0}
+                      role="button"
+                      aria-label={`Play ${project.name} on Itch.io`}
                     >
-                      {project.url ? (
-                        <a
-                          href={project.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block h-full hover:scale-[1.02] transition-transform duration-300 focus:outline-none focus:ring-2 focus:ring-[#A970FF] focus:ring-offset-2 focus:ring-offset-[#0e0e10] rounded-2xl cursor-pointer"
-                        >
-                          <ProjectContent project={project} />
-                        </a>
-                      ) : (
-                        <ProjectContent project={project} />
-                      )}
+                      <ProjectContent project={project} />
                     </article>
                   ))
                 )}
@@ -368,9 +373,6 @@ function ProjectContent({ project }: { project: Project }) {
           <div className="flex items-center text-[#A970FF]/80 text-sm font-medium">
             <ExternalLink className="w-4 h-4 mr-2 group-hover:text-[#A970FF] transition-colors" />
             <span className="group-hover:text-[#A970FF] transition-colors">Click to play on Itch.io</span>
-          </div>
-          <div className="text-[#F4F4F5]/60 text-xs">
-            {project.platform}
           </div>
         </div>
       </div>
