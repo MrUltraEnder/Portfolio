@@ -35,13 +35,24 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
     try {
       // Restore saved language state from localStorage
       const savedLang = localStorage.getItem('portfolio-language') as 'en' | 'es' | null
+      const savedTranslations = localStorage.getItem('portfolio-translations')
       const isTranslated = document.documentElement.getAttribute('data-translated')
       
       if (savedLang) {
         setCurrentLang(savedLang)
         
-        // If we have a saved Spanish state but page is not translated, translate it
-        if (savedLang === 'es' && isTranslated !== 'true') {
+        // If we have Spanish saved and translations cached, apply them directly
+        if (savedLang === 'es' && savedTranslations && isTranslated !== 'true') {
+          try {
+            const translations = JSON.parse(savedTranslations)
+            await applyStoredTranslations(translations)
+            document.documentElement.setAttribute('data-translated', 'true')
+          } catch (error) {
+            console.warn('Failed to apply stored translations, retranslating...', error)
+            await translateToSpanish()
+          }
+        } else if (savedLang === 'es' && isTranslated !== 'true') {
+          // No cached translations, translate fresh
           await translateToSpanish()
         } else if (savedLang === 'en' && isTranslated === 'true') {
           // If saved as English but page is marked as translated, translate back to English
@@ -151,11 +162,32 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
     }
   }
 
+  const applyStoredTranslations = async (translations: { [key: string]: string }) => {
+    // Get all text nodes from the page
+    const textNodes = getTextNodes(document.body)
+    
+    // Apply stored translations to matching text nodes
+    textNodes.forEach(node => {
+      const text = node.textContent?.trim()
+      if (text && translations[text]) {
+        node.textContent = translations[text]
+      }
+    })
+  }
+
   const isProtectedWord = (text: string): boolean => {
     return PROTECTED_WORDS.some(word => 
       text.toLowerCase().includes(word.toLowerCase()) ||
       word.toLowerCase().includes(text.toLowerCase())
     )
+  }
+
+  const containsProtectedWords = (text: string): boolean => {
+    // Check if the text contains any protected words
+    return PROTECTED_WORDS.some(word => {
+      const regex = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi')
+      return regex.test(text)
+    })
   }
 
   const translatePage = async () => {
@@ -267,27 +299,24 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
     // Get all text nodes from the page
     const textNodes = getTextNodes(document.body)
     const textsToTranslate: string[] = []
-    const originalTextsMap = new Map<string, string>()
+    const nodeTextMap = new Map<Text, string>() // Map nodes to their original text
     
     // Filter out empty or very short texts and collect unique texts
     textNodes.forEach(node => {
       const text = node.textContent?.trim()
-      if (text && text.length > 1 && !isNumericOrSymbol(text)) {
-        // Protect specific words before translation
-        const protectedText = protectWords(text)
-        textsToTranslate.push(protectedText)
-        originalTextsMap.set(protectedText, text) // Store mapping
+      if (text && text.length > 1 && !isNumericOrSymbol(text) && !containsProtectedWords(text)) {
+        nodeTextMap.set(node, text)
+        textsToTranslate.push(text)
       }
     })
 
-    // Remove duplicates
+    // Remove duplicates for API call efficiency
     const uniqueTexts = [...new Set(textsToTranslate)]
     
     if (uniqueTexts.length === 0) return
 
     try {
       // For GitHub Pages (static export), call Google Translate API directly
-      // The API key is embedded during build time as a public environment variable
       const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_TRANSLATE_API_KEY;
       
       if (!API_KEY) {
@@ -295,13 +324,13 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
       }
       
       // Translate texts in batches
-      const batchSize = 15 // Reduced batch size for better handling
+      const batchSize = 15
       const translations: { [key: string]: string } = {}
       
       for (let i = 0; i < uniqueTexts.length; i += batchSize) {
         const batch = uniqueTexts.slice(i, i + batchSize)
         
-        // Call Google Translate API directly
+        // Call Google Translate API directly (no protection needed since we filter beforehand)
         const response = await fetch(
           `https://translation.googleapis.com/language/translate/v2?key=${API_KEY}`,
           {
@@ -332,13 +361,10 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
         
         if (data.data && data.data.translations) {
           data.data.translations.forEach((translation: any, index: number) => {
-            const protectedOriginal = batch[index]
-            let translatedText = translation.translatedText
+            const originalText = batch[index]
+            const translatedText = translation.translatedText
             
-            // Restore protected words
-            translatedText = restoreProtectedWords(translatedText)
-            
-            translations[protectedOriginal] = translatedText
+            translations[originalText] = translatedText
           })
         }
         
@@ -348,47 +374,24 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
         }
       }
 
-      // Apply translations to the page
-      textNodes.forEach(node => {
-        const originalText = node.textContent?.trim()
-        if (originalText) {
-          const protectedOriginal = protectWords(originalText)
-          if (translations[protectedOriginal]) {
-            node.textContent = translations[protectedOriginal]
-          }
+      // Apply translations only to nodes that were included in translation
+      nodeTextMap.forEach((originalText, node) => {
+        if (translations[originalText]) {
+          node.textContent = translations[originalText]
         }
       })
+
+      // Save translations to localStorage for persistence
+      if (target === 'es') {
+        localStorage.setItem('portfolio-translations', JSON.stringify(translations))
+      } else {
+        localStorage.removeItem('portfolio-translations')
+      }
 
     } catch (error) {
       console.error('Translation error:', error)
       throw error
     }
-  }
-
-  const protectWords = (text: string): string => {
-    let protectedText = text
-    
-    PROTECTED_WORDS.forEach((word, index) => {
-      const placeholder = `__PROTECTED_${index}__`
-      // Create case-insensitive regex that matches whole words
-      const regex = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi')
-      protectedText = protectedText.replace(regex, placeholder)
-    })
-    
-    return protectedText
-  }
-
-  const restoreProtectedWords = (text: string): string => {
-    let restoredText = text
-    
-    PROTECTED_WORDS.forEach((word, index) => {
-      const placeholder = `__PROTECTED_${index}__`
-      // Replace all instances of the placeholder with the original word
-      const regex = new RegExp(placeholder, 'gi')
-      restoredText = restoredText.replace(regex, word)
-    })
-    
-    return restoredText
   }
 
   const getTextNodes = (element: Element): Text[] => {
