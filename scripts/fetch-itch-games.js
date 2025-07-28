@@ -236,41 +236,36 @@ async function main() {
     const publishedGames = response.games
       .filter(game => game.published && game.published_at)
       .map(game => {
-        // Extract platform information correctly from Itch.io API
-        let platforms = [];
-        const platformsObj = game.platforms || {};
+        // Process platforms from p_* boolean properties (real Itch.io API format)
+        const platforms = []
         
-        // Check each platform property and add to array if true
-        Object.keys(platformsObj).forEach(platform => {
-          if (platformsObj[platform] === true) {
-            switch(platform) {
-              case 'windows':
-                platforms.push('Windows');
-                break;
-              case 'osx':
-                platforms.push('macOS');
-                break;
-              case 'linux':
-                platforms.push('Linux');
-                break;
-              case 'android':
-                platforms.push('Android');
-                break;
-              case 'web':
-                platforms.push('WebGL');
-                break;
-              default:
-                platforms.push(platform.charAt(0).toUpperCase() + platform.slice(1));
-            }
-          }
-        });
-        
-        // Default to WebGL if no platforms specified
-        if (platforms.length === 0) {
-          platforms = ['WebGL'];
+        // Check platform boolean properties
+        if (game.p_windows === true) {
+          platforms.push('Windows')
+        }
+        if (game.p_android === true) {
+          platforms.push('Android')
+        }
+        if (game.p_osx === true) {
+          platforms.push('macOS')
+        }
+        if (game.p_linux === true) {
+          platforms.push('Linux')
         }
         
-        console.log(`${game.title} platforms:`, platformsObj, '-> processed:', platforms);
+        // Check if it's an HTML game (WebGL)
+        if (game.type === 'html') {
+          platforms.push('WebGL')
+        }
+        
+        // Log platform detection for debugging
+        console.log(`${game.title} platforms:`, {
+          p_windows: game.p_windows,
+          p_android: game.p_android,
+          p_osx: game.p_osx,
+          p_linux: game.p_linux,
+          type: game.type
+        }, '-> processed:', platforms);
         
         return {
           title: game.title,
@@ -279,7 +274,7 @@ async function main() {
           url: game.url,
           published_at: game.published_at,
           platforms: platforms,
-          primary_platform: platforms[0] || 'WebGL'
+          primary_platform: platforms[0] || null
         }
       })
       .sort((a, b) => new Date(b.published_at) - new Date(a.published_at)); // Sort by newest first

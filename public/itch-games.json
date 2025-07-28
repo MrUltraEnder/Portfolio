@@ -1,54 +1,6 @@
 {
-  "games": [
-    {
-      "title": "Epic Adventure Quest",
-      "short_text": "A thrilling adventure game with stunning visuals and immersive gameplay mechanics.",
-      "cover_url": "/placeholder.svg",
-      "url": "https://ericzaleta.itch.io/epic-adventure-quest",
-      "published_at": "2024-06-15T10:00:00.000Z",
-      "platforms": [
-        "Windows",
-        "macOS",
-        "Linux"
-      ],
-      "primary_platform": "Windows"
-    },
-    {
-      "title": "Puzzle Master 3D",
-      "short_text": "Challenge your mind with innovative 3D puzzles and dynamic environments.",
-      "cover_url": "/placeholder.svg",
-      "url": "https://ericzaleta.itch.io/puzzle-master-3d",
-      "published_at": "2024-03-20T14:30:00.000Z",
-      "platforms": [
-        "WebGL"
-      ],
-      "primary_platform": "WebGL"
-    },
-    {
-      "title": "Space Explorer VR",
-      "short_text": "Explore the cosmos in this immersive VR experience with realistic physics.",
-      "cover_url": "/placeholder.svg",
-      "url": "https://ericzaleta.itch.io/space-explorer-vr",
-      "published_at": "2024-01-10T09:15:00.000Z",
-      "platforms": [
-        "Windows",
-        "Android"
-      ],
-      "primary_platform": "Windows"
-    },
-    {
-      "title": "Mobile Racing Game",
-      "short_text": "Fast-paced racing action optimized for mobile devices.",
-      "cover_url": "/placeholder.svg",
-      "url": "https://ericzaleta.itch.io/mobile-racing-game",
-      "published_at": "2023-11-05T16:20:00.000Z",
-      "platforms": [
-        "Android"
-      ],
-      "primary_platform": "Android"
-    }
-  ],
-  "generated_at": "2025-07-27T23:04:02.553Z",
-  "count": 4,
-  "error": null
+  "games": [],
+  "generated_at": "2025-07-28T07:32:28.628Z",
+  "count": 0,
+  "error": "Development mode - no API key"
 }

@@ -26,6 +26,41 @@ export interface Project {
   platform?: string
 }
 
+/**
+ * Generates platform tag with emoji based on platforms array
+ * @param platforms - Array of platform strings from Itch.io API
+ * @returns Platform tag with emoji
+ */
+function getPlatformTag(platforms: string[]): string {
+  if (!platforms || platforms.length === 0) {
+    return '' // No tag if no platforms
+  }
+  
+  // Priority order: WebGL > Windows > Android > others
+  if (platforms.includes('WebGL')) {
+    return '🕹️ WebGL'
+  }
+  
+  if (platforms.includes('Windows')) {
+    return '🖥️ Windows'
+  }
+  
+  if (platforms.includes('Android')) {
+    return '� Android'
+  }
+  
+  // Fallback to first platform with appropriate emoji
+  const platform = platforms[0]
+  switch (platform) {
+    case 'macOS':
+      return '🍎 macOS'
+    case 'Linux':
+      return '🐧 Linux'
+    default:
+      return `🎮 ${platform}`
+  }
+}
+
 export function useItchGames() {
   const [itchGames, setItchGames] = useState<ItchGame[]>([])
   const [loading, setLoading] = useState(true)
@@ -105,7 +140,7 @@ export function useItchGames() {
         name: game.title,
         description: game.short_text || 'Interactive game developed with Unity',
         tech: role === 'unity' 
-          ? ['Unity', 'C#', game.primary_platform || 'WebGL', 'Game Development']
+          ? ['Unity', 'C#', getPlatformTag(game.platforms || []), 'Game Development'].filter(Boolean)
           : undefined,
         focus: role === 'designer'
           ? ['Game Design', 'Player Experience', 'Interactive Systems', 'Gameplay Mechanics']
@@ -121,7 +156,7 @@ export function useItchGames() {
         url: game.url,
         type: 'itch' as const,
         published_date: game.published_at,
-        platform: game.primary_platform || 'WebGL'
+        platform: game.primary_platform || 'Unknown'
       }
     })
   }
