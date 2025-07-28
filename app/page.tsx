@@ -59,34 +59,43 @@ export default function HomePage() {
             {/* Role selection cards */}
             <div className="grid md:grid-cols-2 gap-8 mb-16">
               <Link href="/unity-developer" className="group">
-                <div className="role-card bg-[#232329]/50 backdrop-blur-sm border border-[#232329] rounded-2xl p-8 transition-all duration-500 hover:border-[#7EE787]/50 hover:bg-[#7EE787]/5 hover:scale-105 focus-within:ring-2 focus-within:ring-[#7EE787] focus-within:ring-offset-2 focus-within:ring-offset-[#0e0e10]">
-                  <div className="flex items-center justify-center w-16 h-16 bg-[#7EE787]/20 rounded-xl mb-6 mx-auto group-hover:bg-[#7EE787]/30 transition-colors">
-                    <Code className="w-8 h-8 text-[#7EE787]" />
-                  </div>
-                  <h2 className="text-2xl font-bold mb-4 text-[#7EE787]">Unity Developer</h2>
-                  <p className="text-[#F4F4F5]/70 mb-6 leading-relaxed">
-                    Engineering immersive gameplay, VR/AR experiences, and interactive applications with cutting-edge
-                    technology
-                  </p>
-                  <div className="flex items-center justify-center text-[#7EE787] group-hover:translate-x-2 transition-transform">
-                    <span className="mr-2 font-medium">Explore Code</span>
-                    <ArrowRight className="w-4 h-4" />
+                <div className="role-card bg-[#232329]/50 backdrop-blur-sm border border-[#232329] rounded-2xl p-8 h-80 flex flex-col justify-between transition-all duration-500 hover:border-[#7EE787]/50 hover:bg-[#7EE787]/5 hover:scale-105 focus-within:ring-2 focus-within:ring-[#7EE787] focus-within:ring-offset-2 focus-within:ring-offset-[#0e0e10]">
+                  <div className="flex flex-col items-center text-center h-full">
+                    <div className="flex items-center justify-center w-16 h-16 bg-[#7EE787]/20 rounded-xl mb-6 group-hover:bg-[#7EE787]/30 transition-colors">
+                      <Code className="w-8 h-8 text-[#7EE787]" />
+                    </div>
+                    <div className="flex-1 flex flex-col justify-center">
+                      <h2 className="text-2xl font-bold mb-4 text-[#7EE787] text-center">Unity Developer</h2>
+                      <p className="text-[#F4F4F5]/70 mb-6 leading-relaxed">
+                        Engineering immersive gameplay, VR/AR experiences, and interactive applications with
+                        cutting-edge technology
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-center text-[#7EE787] group-hover:translate-x-2 transition-transform">
+                      <span className="mr-2 font-medium">Explore Code</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
                   </div>
                 </div>
               </Link>
 
               <Link href="/game-designer" className="group">
-                <div className="role-card bg-[#232329]/50 backdrop-blur-sm border border-[#232329] rounded-2xl p-8 transition-all duration-500 hover:border-[#A970FF]/50 hover:bg-[#A970FF]/5 hover:scale-105 focus-within:ring-2 focus-within:ring-[#A970FF] focus-within:ring-offset-2 focus-within:ring-offset-[#0e0e10]">
-                  <div className="flex items-center justify-center w-16 h-16 bg-[#A970FF]/20 rounded-xl mb-6 mx-auto group-hover:bg-[#A970FF]/30 transition-colors">
-                    <Gamepad2 className="w-8 h-8 text-[#A970FF]" />
-                  </div>
-                  <h2 className="text-2xl font-bold mb-4 text-[#A970FF]">Game Designer</h2>
-                  <p className="text-[#F4F4F5]/70 mb-6 leading-relaxed">
-                    Designing meaningful interactions, player experiences, and systems that create lasting engagement
-                  </p>
-                  <div className="flex items-center justify-center text-[#A970FF] group-hover:translate-x-2 transition-transform">
-                    <span className="mr-2 font-medium">Explore Design</span>
-                    <ArrowRight className="w-4 h-4" />
+                <div className="role-card bg-[#232329]/50 backdrop-blur-sm border border-[#232329] rounded-2xl p-8 h-80 flex flex-col justify-between transition-all duration-500 hover:border-[#A970FF]/50 hover:bg-[#A970FF]/5 hover:scale-105 focus-within:ring-2 focus-within:ring-[#A970FF] focus-within:ring-offset-2 focus-within:ring-offset-[#0e0e10]">
+                  <div className="flex flex-col items-center text-center h-full">
+                    <div className="flex items-center justify-center w-16 h-16 bg-[#A970FF]/20 rounded-xl mb-6 group-hover:bg-[#A970FF]/30 transition-colors">
+                      <Gamepad2 className="w-8 h-8 text-[#A970FF]" />
+                    </div>
+                    <div className="flex-1 flex flex-col justify-center">
+                      <h2 className="text-2xl font-bold mb-4 text-[#A970FF] text-center">Game Designer</h2>
+                      <p className="text-[#F4F4F5]/70 mb-6 leading-relaxed">
+                        Designing meaningful interactions, player experiences, and systems that create lasting
+                        engagement
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-center text-[#A970FF] group-hover:translate-x-2 transition-transform">
+                      <span className="mr-2 font-medium">Explore Design</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
                   </div>
                 </div>
               </Link>

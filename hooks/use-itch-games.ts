@@ -105,7 +105,7 @@ export function useItchGames() {
         name: game.title,
         description: game.short_text || 'Interactive game developed with Unity',
         tech: role === 'unity' 
-          ? ['Unity', 'C#', ...(game.primary_platform ? [game.primary_platform] : []), 'Game Development']
+          ? ['Unity', 'C#', game.primary_platform || 'WebGL', 'Game Development']
           : undefined,
         focus: role === 'designer'
           ? ['Game Design', 'Player Experience', 'Interactive Systems', 'Gameplay Mechanics']
@@ -121,7 +121,7 @@ export function useItchGames() {
         url: game.url,
         type: 'itch' as const,
         published_date: game.published_at,
-        ...(game.primary_platform && { platform: game.primary_platform })
+        platform: game.primary_platform || 'WebGL'
       }
     })
   }

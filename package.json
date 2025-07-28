@@ -6,9 +6,9 @@
     "build": "next build",
     "dev": "next dev",
     "export": "next export",
+    "fetch-games": "node scripts/fetch-itch-games.js",
     "lint": "next lint",
-    "start": "next start",
-    "fetch-games": "node scripts/fetch-itch-games.js"
+    "start": "next start"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -45,11 +45,14 @@
     "cmdk": "latest",
     "date-fns": "4.1.0",
     "embla-carousel-react": "latest",
+    "fs": "latest",
     "geist": "^1.3.1",
+    "https": "latest",
     "input-otp": "latest",
     "lucide-react": "^0.454.0",
     "next": "15.2.4",
     "next-themes": "latest",
+    "path": "latest",
     "react": "^19",
     "react-day-picker": "latest",
     "react-dom": "^19",
