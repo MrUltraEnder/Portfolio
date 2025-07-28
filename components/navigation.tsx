@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import { Menu, Code, Gamepad2, User, Mail, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { LanguageToggle } from "@/components/language-toggle"
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
@@ -48,25 +49,27 @@ export function Navigation() {
         aria-label="Main navigation"
       >
         <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
+          <div className="grid grid-cols-3 items-center w-full">
             {/* Logo */}
-            <Link
-              href="/"
-              className="text-xl font-bold bg-gradient-to-r from-[#7EE787] to-[#A970FF] bg-clip-text text-transparent hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10] rounded-md px-2 py-1"
-              aria-label="Eric Zaleta - Home"
-            >
-              Eric Zaleta
-            </Link>
+            <div className="flex justify-start">
+              <Link
+                href="/"
+                className="text-xl font-bold bg-gradient-to-r from-[#7EE787] to-[#A970FF] bg-clip-text text-transparent hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10] rounded-md px-2 py-1"
+                aria-label="Eric Zaleta - Home"
+              >
+                Eric Zaleta
+              </Link>
+            </div>
 
-            {/* Desktop Menu */}
-            <div className="hidden md:flex items-center space-x-1">
+            {/* Desktop Menu - Centered */}
+            <div className="hidden md:flex items-center justify-center space-x-4">
               {navItems.map((item) => {
                 const Icon = item.icon
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10] ${
+                    className={`flex items-center px-6 py-1 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10] ${
                       isActive(item.href)
                         ? "bg-[#7EE787]/20 text-[#7EE787] border border-[#7EE787]/30"
                         : "text-[#F4F4F5]/80 hover:text-[#7EE787] hover:bg-[#7EE787]/10"
@@ -81,7 +84,7 @@ export function Navigation() {
             </div>
 
             {/* Action Buttons */}
-            <div className="hidden md:flex items-center space-x-3">
+            <div className="hidden md:flex items-center justify-end space-x-3">
               <Button
                 variant="outline"
                 size="sm"
@@ -97,26 +100,23 @@ export function Navigation() {
                 <Download className="w-4 h-4 mr-2" />
                 Resume
               </Button>
-              <button
-                type="button"
-                className="language-toggle px-3 py-2 rounded-md text-sm font-medium text-[#F4F4F5] hover:bg-[#232329] focus:outline-none focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10]"
-                aria-label="Toggle language"
-              ></button>
+              <LanguageToggle className="static" />
             </div>
 
-            {/* Mobile Menu Button */}
-            <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="md:hidden text-[#F4F4F5] hover:bg-[#232329]"
-                  aria-label="Open navigation menu"
-                >
-                  <Menu className="w-5 h-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="bg-[#0e0e10] border-[#232329] w-80">
+            {/* Mobile Menu Button - Only visible on mobile */}
+            <div className="col-span-2 md:hidden flex justify-end">
+              <Sheet open={isOpen} onOpenChange={setIsOpen}>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-[#F4F4F5] hover:bg-[#232329]"
+                    aria-label="Open navigation menu"
+                  >
+                    <Menu className="w-5 h-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="bg-[#0e0e10] border-[#232329] w-80">
                 <div className="flex flex-col h-full">
                   <div className="flex items-center justify-between mb-8">
                     <span className="text-lg font-bold bg-gradient-to-r from-[#7EE787] to-[#A970FF] bg-clip-text text-transparent">
@@ -133,7 +133,7 @@ export function Navigation() {
                           key={item.href}
                           href={item.href}
                           onClick={() => setIsOpen(false)}
-                          className={`flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
+                          className={`flex items-center px-4 py-1 rounded-lg text-base font-medium transition-all duration-200 ${
                             isActive(item.href)
                               ? "bg-[#7EE787]/20 text-[#7EE787] border border-[#7EE787]/30"
                               : "text-[#F4F4F5]/80 hover:text-[#7EE787] hover:bg-[#7EE787]/10"
@@ -169,15 +169,14 @@ export function Navigation() {
                         Download Resume
                       </a>
                     </Button>
-                    <button
-                      type="button"
-                      className="language-toggle w-full px-4 py-2 rounded-md text-sm font-medium text-[#F4F4F5] hover:bg-[#232329] focus:outline-none focus:ring-2 focus:ring-[#7EE787] focus:ring-offset-2 focus:ring-offset-[#0e0e10]"
-                      aria-label="Toggle language"
-                    ></button>
+                    <div className="w-full">
+                      <LanguageToggle className="static w-full" />
+                    </div>
                   </div>
                 </div>
               </SheetContent>
             </Sheet>
+          </div>
           </div>
         </div>
       </nav>

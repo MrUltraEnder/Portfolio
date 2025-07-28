@@ -2,7 +2,7 @@ import Link from "next/link"
 import { ArrowRight, Code, Gamepad2, Linkedin, Mail, Phone, Star, Award, Users, Zap } from "lucide-react"
 import { Navigation } from "@/components/navigation"
 import { ProgressIndicator } from "@/components/progress-indicator"
-import { LanguageToggle } from "@/components/language-toggle"
+
 
 export default function HomePage() {
   const stats = [
@@ -16,7 +16,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-[#0e0e10] text-[#F4F4F5]">
       <ProgressIndicator />
       <Navigation />
-      <LanguageToggle />
+      
 
       {/* Background effects */}
       <div className="fixed inset-0 opacity-20">

@@ -180,13 +180,13 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
   }
 
   return (
-    <div className={`fixed top-4 left-4 z-50 ${className}`}>
+    <div className={`${className.includes('static') ? '' : 'fixed top-4 left-4 z-50'} ${className}`}>
       <Button
         onClick={translatePage}
         disabled={isTranslating}
         variant="outline"
         size="sm"
-        className="language-toggle bg-[#232329]/80 backdrop-blur-sm border-[#7EE787]/20 text-[#F4F4F5] hover:bg-[#7EE787]/10 hover:border-[#7EE787]/40 transition-all duration-200"
+        className="language-toggle bg-[#232329]/80 backdrop-blur-sm border-[#7EE787]/20 text-[#F4F4F5] hover:bg-[#7EE787]/10 hover:border-[#7EE787]/40 transition-all duration-200 w-full"
       >
         {isTranslating ? (
           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
