@@ -98,11 +98,13 @@ export default function GameDesignerPage() {
 
         <main id="main-content">
           {/* Hero Section */}
-          <section className="px-6 py-20 text-center">
-            <div className="max-w-4xl mx-auto">
-              <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-[#A970FF] to-[#7EE787] bg-clip-text text-transparent animate-fade-in">
-                Eric Zaleta — Game Designer
-              </h1>
+          <section className="px-6 py-32 text-center overflow-visible">
+            <div className="max-w-6xl mx-auto overflow-visible">
+              <div className="mb-16 overflow-visible">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold bg-gradient-to-r from-[#A970FF] to-[#7EE787] bg-clip-text text-transparent animate-fade-in leading-[1.2] tracking-tight overflow-visible pb-4">
+                  Eric Zaleta — Game Designer
+                </h1>
+              </div>
               <p className="text-xl md:text-2xl text-[#F4F4F5]/80 mb-8 animate-slide-up">
                 Designing meaningful interactions, systems, and player experiences
               </p>
