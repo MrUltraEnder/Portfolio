@@ -35,7 +35,7 @@ export default function UnityDeveloperPage() {
       role: "XR Designer",
       dates: "June 2024 - June 2025",
       highlights: "Created immersive 3D environments and VR prototypes, improving client delivery timelines by 25%",
-      current: true,
+      current: false,
     },
     {
       studio: "FUSE People & Technology",
@@ -43,7 +43,7 @@ export default function UnityDeveloperPage() {
       dates: "August 2022 - June 2025",
       highlights:
         "Developed 20+ interactive apps, improved player engagement by 48.7% and reduced crash rates by 74.3%",
-      current: true,
+      current: false,
     },
     {
       studio: "Grimoire Games",

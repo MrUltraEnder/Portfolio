@@ -46,7 +46,7 @@ function getPlatformTag(platforms: string[]): string {
   }
   
   if (platforms.includes('Android')) {
-    return '� Android'
+    return '📱 Android'
   }
   
   // Fallback to first platform with appropriate emoji

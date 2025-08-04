@@ -57,7 +57,7 @@ export default function HomePage() {
             </div>
 
             {/* Role selection cards */}
-            <div className="grid md:grid-cols-2 gap-8 mb-16">
+            <div className="grid md:grid-cols-1 gap-8 mb-16 max-w-md mx-auto">
               <Link href="/unity-developer" className="group">
                 <div className="role-card bg-[#232329]/50 backdrop-blur-sm border border-[#232329] rounded-2xl p-8 h-80 flex flex-col justify-between transition-all duration-500 hover:border-[#7EE787]/50 hover:bg-[#7EE787]/5 hover:scale-105 focus-within:ring-2 focus-within:ring-[#7EE787] focus-within:ring-offset-2 focus-within:ring-offset-[#0e0e10]">
                   <div className="flex flex-col items-center text-center h-full">
@@ -79,6 +79,7 @@ export default function HomePage() {
                 </div>
               </Link>
 
+              {/* Game Designer card temporarily hidden 
               <Link href="/game-designer" className="group">
                 <div className="role-card bg-[#232329]/50 backdrop-blur-sm border border-[#232329] rounded-2xl p-8 h-80 flex flex-col justify-between transition-all duration-500 hover:border-[#A970FF]/50 hover:bg-[#A970FF]/5 hover:scale-105 focus-within:ring-2 focus-within:ring-[#A970FF] focus-within:ring-offset-2 focus-within:ring-offset-[#0e0e10]">
                   <div className="flex flex-col items-center text-center h-full">
@@ -99,6 +100,7 @@ export default function HomePage() {
                   </div>
                 </div>
               </Link>
+              */}
             </div>
 
             {/* Quick contact */}
