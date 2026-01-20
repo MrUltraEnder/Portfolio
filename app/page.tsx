@@ -6,10 +6,10 @@ import { ProgressIndicator } from "@/components/progress-indicator"
 
 export default function HomePage() {
   const stats = [
-    { icon: Award, label: "Years Experience", value: "6+" },
+    { icon: Award, label: "Years Experience", value: "4+" },
     { icon: Users, label: "Team Members Led", value: "20+" },
-    { icon: Star, label: "Projects Completed", value: "15+" },
-    { icon: Zap, label: "Apps Developed", value: "20+" },
+    { icon: Star, label: "Projects Completed", value: "25+" },
+    { icon: Zap, label: "Apps Developed", value: "30+" },
   ]
 
   return (
