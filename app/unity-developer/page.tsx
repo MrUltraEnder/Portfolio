@@ -107,7 +107,7 @@ export default function UnityDeveloperPage() {
                 </h1>
               </div>
               <p className="text-xl md:text-2xl text-[#F4F4F5]/80 mb-8 animate-slide-up">
-                Engineering immersive gameplay, XR experiences & interactive applications
+                Building immersive gameplay, VR/AR experiences, and interactive systems
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
                 <Button 
@@ -143,16 +143,11 @@ export default function UnityDeveloperPage() {
             <div className="max-w-4xl mx-auto">
               <h2 className="text-3xl font-bold mb-8 text-[#7EE787]">About Me</h2>
               <div className="bg-[#232329]/30 backdrop-blur-sm rounded-2xl p-8 border border-[#232329]">
-                <p className="text-lg leading-relaxed text-[#F4F4F5]/90 mb-6">
-                  I'm a passionate Unity developer with over 6 years of experience creating immersive experiences that
-                  push the boundaries of interactive technology. My expertise spans from VR/AR applications to
-                  multiplayer systems and interactive enterprise applications.
-                </p>
                 <p className="text-lg leading-relaxed text-[#F4F4F5]/90">
-                  I've led teams of 4-20 members through the development of 15+ video games and created over 20
-                  interactive apps using cutting-edge technologies. Whether it's crafting XR training modules,
-                  implementing AI systems, or optimizing performance pipelines, I bring both technical precision and
-                  creative vision to every project.
+                  Unity Developer with 4+ years of experience creating immersive games and interactive applications. Expert in gameplay mechanics, performance optimization, and VR/AR development. Led teams of 20+ members through 15+ projects. Focused on production-ready code and scalable systems.
+                </p>
+                <p className="text-lg leading-relaxed text-[#F4F4F5]/90 mt-6">
+                  Ready to bring your next project to life with technical precision and creative problem-solving.
                 </p>
               </div>
             </div>
@@ -278,9 +273,9 @@ export default function UnityDeveloperPage() {
           {/* Contact Section */}
           <section id="contact" className="px-6 py-20">
             <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-3xl font-bold mb-6 text-[#7EE787]">Let's Build Something Amazing</h2>
+              <h2 className="text-3xl font-bold mb-6 text-[#7EE787]">Ready to Build Together?</h2>
               <p className="text-xl text-[#F4F4F5]/80 mb-8 leading-relaxed">
-                Ready to bring your next Unity project to life? Let's collaborate and create something extraordinary.
+                Looking for a Unity Developer who delivers production-ready code and polished gameplay? Let's discuss how I can contribute to your team's success.
               </p>
               <div className="flex flex-wrap justify-center gap-4 mb-12">
                 <Button

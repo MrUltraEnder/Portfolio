@@ -33,10 +33,26 @@ export default function HomePage() {
               <h1 className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-[#7EE787] to-[#A970FF] bg-clip-text text-transparent">
                 Eric Zaleta
               </h1>
-              <p className="text-xl md:text-2xl text-[#F4F4F5]/80 font-light mb-8">Unity Developer & Game Designer</p>
+              <p className="text-xl md:text-2xl text-[#F4F4F5]/80 font-light mb-8">Unity Developer</p>
+
+              {/* Value bullets */}
+              <div className="max-w-2xl mx-auto mb-8 space-y-3 text-left">
+                <div className="flex items-center gap-3 text-[#F4F4F5]/80">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#7EE787] flex-shrink-0"></div>
+                  <span>Gameplay mechanics & interactive systems</span>
+                </div>
+                <div className="flex items-center gap-3 text-[#F4F4F5]/80">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#7EE787] flex-shrink-0"></div>
+                  <span>Performance optimization & pipelines</span>
+                </div>
+                <div className="flex items-center gap-3 text-[#F4F4F5]/80">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#7EE787] flex-shrink-0"></div>
+                  <span>VR/AR experiences & multiplayer</span>
+                </div>
+              </div>
+
               <p className="text-lg text-[#F4F4F5]/60 max-w-2xl mx-auto leading-relaxed">
-                Creating immersive experiences and meaningful interactions through code and design. Choose your path to
-                explore my work.
+                Creating immersive, performant experiences with precision. Specialized in Unity development with focus on gameplay polish and production-ready code.
               </p>
             </div>
 
