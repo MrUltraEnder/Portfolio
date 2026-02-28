@@ -125,8 +125,7 @@ export default function UnityDeveloperPage() {
                   asChild
                 >
                   <a
-                    href="/Portfolio/Eric-Zaleta-Unity-Developer-Resume.pdf"
-                    download="Eric-Zaleta-Unity-Developer-Resume.pdf"
+                    href="https://drive.google.com/uc?export=download&id=16dsQVTxLl7ziUxzEz151g7Bc8THgvQtn"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
