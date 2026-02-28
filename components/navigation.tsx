@@ -103,8 +103,7 @@ export function Navigation() {
                 asChild
               >
                 <a
-                  href="/Portfolio/Eric-Zaleta-Unity-Developer-Resume.pdf"
-                  download="Eric-Zaleta-Unity-Developer-Resume.pdf"
+                  href="https://drive.google.com/uc?export=download&id=16dsQVTxLl7ziUxzEz151g7Bc8THgvQtn"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -173,8 +172,7 @@ export function Navigation() {
                     </Button>
                     <Button className="w-full bg-[#7EE787] text-[#0e0e10] hover:bg-[#7EE787]/90" asChild>
                       <a
-                        href="/Portfolio/Eric-Zaleta-Unity-Developer-Resume.pdf"
-                        download="Eric-Zaleta-Unity-Developer-Resume.pdf"
+                        href="https://drive.google.com/uc?export=download&id=16dsQVTxLl7ziUxzEz151g7Bc8THgvQtn"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
