@@ -1,0 +1,167 @@
+.portfolio {
+  --canvas: #19141e;
+  --ink: #f5f0fc;
+  --lilac: #c3a1f1;
+  --secondary-ink: #c9bdd5;
+  --surface: #292032;
+  --deep: #482a68;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--editorial-body), sans-serif;
+  line-height: 1.65;
+  padding: 0 max(24px, calc((100vw - 1280px) / 2));
+  overflow: clip;
+  color-scheme: dark;
+}
+
+.portfolio * { box-sizing: border-box; }
+.portfolio ::selection { background: var(--lilac); color: var(--canvas); }
+.portfolio a { color: inherit; text-underline-offset: 6px; }
+.portfolio a:hover { text-decoration: underline; }
+.portfolio button, .portfolio input { font: inherit; }
+.portfolio button { cursor: pointer; }
+.portfolio :is(a, button, input):focus-visible { outline: 3px solid var(--lilac); outline-offset: 5px; }
+.portfolio :is(button, a):active { transform: scale(.98); }
+.portfolio svg { width: 20px; height: 20px; flex-shrink: 0; }
+.portfolio :is(h1, h2, h3, p, figure) { margin: 0; }
+.portfolio :is(h1, h2, h3) { text-wrap: balance; }
+.portfolio :is(section, main) { scroll-margin-top: 28px; }
+.skip { position: absolute; left: 24px; top: -100px; z-index: 10; padding: 14px 20px; background: var(--lilac); color: var(--canvas) !important; }
+.skip:focus { top: 12px; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 30px 0; }
+.brand { font-weight: 700; font-size: 20px; letter-spacing: -.03em; white-space: nowrap; }
+.header nav { display: flex; gap: 26px; align-items: center; font-size: 14px; }
+.header nav a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
+.header nav svg { width: 16px; height: 16px; }
+.hero { padding: 52px 0 0; }
+.typeStage { position: relative; container-type: inline-size; }
+.typeStage h1 { font-family: var(--editorial-display), sans-serif; font-weight: 800; letter-spacing: -.04em; line-height: .94; }
+.typeStage h1 span { display: block; }
+.typeStage h1 span:first-child { font-size: 12.8cqw; }
+.typeStage h1 span:last-child { font-size: 11.9cqw; }
+.typeWindow { position: absolute; right: 1%; top: 1.2cqw; width: 42%; height: 9cqw; transform: rotate(-2deg); overflow: clip; }
+.typeWindow img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 46%; }
+.intro { display: grid; grid-template-columns: 1.2fr .8fr; gap: 40px; align-items: end; margin-top: 40px; }
+.intro > p { max-width: 43ch; font-size: 19px; }
+.primary { display: inline-flex; align-items: center; justify-content: center; justify-self: end; gap: 36px; min-height: 58px; padding: 16px 24px; background: var(--lilac); color: var(--canvas) !important; font-size: 16px; font-weight: 700; transition: transform 180ms cubic-bezier(.23,1,.32,1); }
+.primary:hover { text-decoration: none !important; }
+.work { margin-top: 92px; }
+.workTop { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 26px; }
+.workTop h2 { font-size: 20px; font-weight: 500; }
+.projectChoices { display: flex; gap: 8px; flex-wrap: wrap; }
+.projectChoices button { border: 0; background: transparent; color: var(--ink); font-size: 14px; min-height: 48px; padding: 12px 18px; }
+.projectChoices button[aria-pressed="true"] { background: var(--lilac); color: var(--canvas); }
+.projectFrame { transform: rotate(1deg); overflow: clip; background: var(--surface); }
+.projectFrame img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+.caption { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; margin-top: 42px; }
+.caption h3 { font-family: var(--editorial-display), sans-serif; font-size: clamp(28px, 3.7vw, 52px); font-weight: 700; line-height: 1.1; letter-spacing: -.035em; overflow-wrap: anywhere; }
+.caption p { max-width: 48ch; }
+.caption > div:first-child p { margin-top: 16px; color: var(--secondary-ink); font-size: 14px; }
+.caption a { display: inline-flex; align-items: center; gap: 12px; margin-top: 20px; text-decoration: underline; min-height: 44px; }
+.detail { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: end; margin: 36px 0 0 auto !important; width: 65%; }
+.detail img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+.detail figcaption { font-size: 14px; color: var(--secondary-ink); max-width: 24ch; }
+.status { padding: 60px 24px; background: var(--surface); }
+.status h3 { font-size: 24px; line-height: 1.3; margin-bottom: 12px; }
+.status a { text-decoration: underline; }
+.indexHeader { display: flex; align-items: end; justify-content: space-between; gap: 32px; margin: 72px 0 26px; }
+.indexHeader h3 { font-size: 24px; font-weight: 500; }
+.search { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.search label { font-size: 14px; color: var(--secondary-ink); }
+.search input { width: 250px; max-width: 100%; min-height: 48px; border: 0; border-radius: 0; padding: 12px 16px; background: var(--surface); color: var(--ink); caret-color: var(--lilac); }
+.search input::placeholder { color: var(--secondary-ink); }
+.search button { min-height: 44px; padding: 8px; color: var(--ink); background: none; border: 0; text-decoration: underline; }
+.projectIndex { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 30px; }
+.projectIndex li { display: flex; align-items: stretch; min-width: 0; }
+.projectIndex button { flex: 1; min-width: 0; min-height: 64px; padding: 14px 16px; border: 0; text-align: left; display: flex; justify-content: space-between; align-items: center; gap: 16px; color: var(--ink); background: transparent; }
+.projectIndex button > span:first-child { overflow-wrap: anywhere; }
+.projectIndex button[aria-pressed="true"] { background: var(--surface); }
+.projectIndex .platform { color: var(--secondary-ink); font-size: 13px; white-space: nowrap; }
+.projectIndex a { display: grid; place-items: center; min-width: 48px; }
+.about { display: grid; grid-template-columns: 1.15fr .85fr; gap: 64px; margin-top: 130px; padding: 56px 0; }
+.portfolio :is(.about, .experience, .skills, .contact) h2 { font-family: var(--editorial-display), sans-serif; font-size: clamp(32px, 4.3vw, 60px); font-weight: 700; line-height: 1.08; letter-spacing: -.035em; }
+.about p + p { margin-top: 22px; }
+.experience { margin-top: 100px; }
+.experience > h2 { margin-bottom: 52px; }
+.job { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; padding: 32px 0; }
+.job h3 { font-size: 23px; font-weight: 500; line-height: 1.3; }
+.job > div > p { margin-top: 8px; }
+.job .dates { color: var(--secondary-ink); font-size: 14px; }
+.job > p { max-width: 48ch; }
+.skills { display: grid; grid-template-columns: .8fr 1.2fr; gap: 70px; margin-top: 130px; }
+.skills dl { margin: 0; }
+.skills dl > div + div { margin-top: 28px; }
+.skills dt { color: var(--secondary-ink); font-size: 14px; margin-bottom: 6px; }
+.skills dd { margin: 0; font-size: 19px; }
+.contact { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 50px; margin: 140px calc(-1 * max(24px, calc((100vw - 1280px) / 2))) 0; padding: 72px max(24px, calc((100vw - 1280px) / 2)); background: var(--deep); }
+.contact > div > p { margin-bottom: 24px; }
+.email { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; font-size: clamp(16px, 2vw, 26px); text-decoration: underline; overflow-wrap: anywhere; }
+.contactLinks { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 26px; font-size: 14px; }
+.contactLinks a { display: inline-flex; align-items: center; min-height: 44px; }
+.footer { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 26px 0; font-size: 13px; color: var(--secondary-ink); }
+.footer a { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .primary:hover { transform: translateY(-3px); }
+  .projectChoices button:hover { text-decoration: underline; }
+  .projectIndex :is(button, a):hover { background: var(--surface); }
+}
+
+@media (min-width: 1500px) { .typeStage h1 span:first-child { font-size: 164px; } .typeStage h1 span:last-child { font-size: 152px; } }
+@media (max-width: 800px) {
+  .header { align-items: start; padding-top: 22px; }
+  .header nav { gap: 10px 18px; flex-wrap: wrap; justify-content: end; font-size: 13px; }
+  .brand { font-size: 17px; }
+  .intro { gap: 24px; }
+  .intro > p { font-size: 16px; }
+  .primary { font-size: 14px; gap: 20px; padding: 14px 18px; }
+  .work { margin-top: 64px; }
+  .caption { gap: 28px; margin-top: 30px; }
+  .detail { width: 75%; gap: 24px; }
+  .indexHeader { align-items: start; flex-direction: column; gap: 20px; }
+  .projectIndex { grid-template-columns: 1fr; }
+  .about, .job, .skills, .contact { gap: 32px; }
+  .about { margin-top: 76px; }
+  .skills { grid-template-columns: 1fr 1fr; }
+  .portfolio :is(.about, .experience, .skills, .contact) h2 { font-size: 36px; }
+}
+
+@media (max-width: 520px) {
+  .portfolio { padding-inline: 22px; }
+  .header { display: block; padding-bottom: 14px; }
+  .header nav { justify-content: start; gap: 6px 22px; margin-top: 10px; }
+  .header nav a { font-size: 12px; }
+  .header nav svg { width: 14px; }
+  .hero { padding-top: 28px; }
+  .intro { grid-template-columns: 1fr; margin-top: 26px; }
+  .intro > p { max-width: 36ch; }
+  .primary { justify-self: start; }
+  .work { margin-top: 52px; }
+  .workTop { align-items: start; flex-direction: column; gap: 14px; margin-bottom: 20px; }
+  .workTop h2 { font-size: 19px; }
+  .projectChoices { gap: 4px; }
+  .projectChoices button { padding-inline: 14px; font-size: 13px; }
+  .caption { grid-template-columns: 1fr; gap: 20px; }
+  .caption h3 { font-size: 30px; }
+  .caption > div:first-child p { margin-top: 10px; }
+  .caption a { margin-top: 10px; }
+  .detail { width: 100%; grid-template-columns: 1.25fr .75fr; gap: 20px; }
+  .detail figcaption { font-size: 12px; }
+  .indexHeader { margin-top: 48px; }
+  .search { width: 100%; align-items: start; flex-direction: column; gap: 8px; }
+  .search input { width: 100%; }
+  .projectIndex button { padding-inline: 8px; font-size: 14px; }
+  .projectIndex .platform { font-size: 12px; }
+  .about, .job, .skills, .contact { grid-template-columns: 1fr; }
+  .about { gap: 28px; padding: 28px 0 0; }
+  .experience { margin-top: 76px; }
+  .experience > h2 { margin-bottom: 26px; }
+  .job { padding-block: 22px; gap: 18px; }
+  .job h3 { font-size: 22px; }
+  .skills { margin-top: 76px; }
+  .skills dd { font-size: 17px; }
+  .contact { margin: 88px -22px 0; padding: 48px 22px; }
+  .footer { align-items: start; flex-direction: column; gap: 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) { .portfolio *, .portfolio *::before, .portfolio *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }

@@ -1,0 +1,37 @@
+{
+  "note": "Original project screenshots, resized and encoded as WebP. No generated gameplay.",
+  "images": [
+    {
+      "file": "bubble-play.webp",
+      "source": "https://img.itch.zone/aW1hZ2UvMzI3Mjg3NS8xOTU1MjE0Ny5wbmc=/original/DYSU76.png",
+      "project": "https://tboxfinn.itch.io/bubbleware"
+    },
+    {
+      "file": "bubble-world.webp",
+      "source": "https://img.itch.zone/aW1hZ2UvMzI3Mjg3NS8xOTU1MjE4MS5wbmc=/original/g8CYwq.png",
+      "project": "https://tboxfinn.itch.io/bubbleware"
+    },
+    {
+      "file": "orrery-world.webp",
+      "source": "https://img.itch.zone/aW1hZ2UvMzAyMjU2MC8xODA3NDkxMC5wbmc=/original/sYvMFz.png",
+      "project": "https://grimoirestudios.itch.io/orreryready"
+    },
+    {
+      "file": "orrery-detail.webp",
+      "source": "https://img.itch.zone/aW1hZ2UvMzAyMjU2MC8xODA3NDkzMS5wbmc=/original/jQs7WJ.png",
+      "project": "https://grimoirestudios.itch.io/orreryready"
+    }
+  ],
+  "fonts": [
+    {
+      "family": "Syne",
+      "source": "https://fonts.google.com/specimen/Syne",
+      "license": "SIL Open Font License 1.1"
+    },
+    {
+      "family": "Epilogue",
+      "source": "https://fonts.google.com/specimen/Epilogue",
+      "license": "SIL Open Font License 1.1"
+    }
+  ]
+}

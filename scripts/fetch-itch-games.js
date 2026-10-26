@@ -79,17 +79,17 @@ function generateHTML(games) {
   const gameCards = games.map(game => {
     const title = game.title || 'Untitled Game';
     const description = game.short_text || 'No description available.';
-    const coverUrl = game.cover_url || '/placeholder.svg?height=300&width=500';
+    const coverUrl = game.cover_url || './placeholder.svg?height=300&width=500';
     const gameUrl = game.url || '#';
     
     return `
-      <div class="bg-[#232329]/30 backdrop-blur-sm rounded-2xl overflow-hidden border border-[#232329] group hover:border-[#7EE787]/30 transition-all duration-300">
+      <div class="game-card bg-[#232329]/30 backdrop-blur-sm rounded-2xl overflow-hidden border border-[#232329] group hover:border-[#7EE787]/30 transition-all duration-300">
         <div class="aspect-video overflow-hidden">
           <img 
             src="${coverUrl}" 
             alt="${title} cover"
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            onerror="this.src='/Portfolio/placeholder.svg?height=300&width=500'"
+            onerror="this.onerror=null;this.src='./placeholder.svg?height=300&width=500'"
           />
         </div>
         <div class="p-6">
@@ -217,6 +217,14 @@ async function main() {
     // Validate environment variables
     const apiKey = process.env.ITCH_API_KEY;
     if (!apiKey) {
+      const cachePath = path.join(process.cwd(), 'public', 'itch-games.json');
+      if (fs.existsSync(cachePath)) {
+        const cached = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
+        if (!cached.error && Array.isArray(cached.games)) {
+          console.log('Using the cached Itch.io catalog; ITCH_API_KEY is not configured.');
+          return;
+        }
+      }
       throw new Error('ITCH_API_KEY environment variable is required');
     }
 
@@ -317,33 +325,7 @@ async function main() {
   } catch (error) {
     console.error('❌ Error:', error.message);
     
-    // Generate fallback HTML with error message in development
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('🔧 Generating fallback HTML for development...');
-      
-      const fallbackHTML = generateHTML([]);
-      const fallbackJSON = JSON.stringify({
-        games: [],
-        generated_at: new Date().toISOString(),
-        count: 0,
-        error: 'Development mode - no API key'
-      }, null, 2);
-      
-      const outputDir = path.join(process.cwd(), 'public');
-      if (!fs.existsSync(outputDir)) {
-        fs.mkdirSync(outputDir, { recursive: true });
-      }
-      
-      const outputPath = path.join(outputDir, 'itch-games.html');
-      const jsonPath = path.join(outputDir, 'itch-games.json');
-      
-      fs.writeFileSync(outputPath, fallbackHTML, 'utf8');
-      fs.writeFileSync(jsonPath, fallbackJSON, 'utf8');
-      
-      console.log('📄 Fallback HTML generated successfully');
-      console.log('📊 Fallback JSON generated successfully');
-    }
-    
+    // Preserve the last successful catalog on configuration or upstream errors.
     process.exit(1);
   }
 }

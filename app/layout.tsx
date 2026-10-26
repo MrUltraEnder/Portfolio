@@ -1,8 +1,7 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import Script from "next/script"
 import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -14,8 +13,12 @@ export const metadata: Metadata = {
   keywords:
     "Unity Developer, Game Designer, VR, AR, XR Designer, Interactive Applications, Game Development, Eric Zaleta",
   authors: [{ name: "Eric Zaleta" }],
-  viewport: "width=device-width, initial-scale=1",
   generator: "v0.dev",
+}
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 }
 
 export default function RootLayout({
@@ -32,7 +35,6 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased`}>
         {children}
         <Toaster />
-        <Script src="/translator.js" strategy="afterInteractive" />
       </body>
     </html>
   )

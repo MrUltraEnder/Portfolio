@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
+import { loadItchGames as loadCatalog } from '@/lib/load-itch-games.mjs'
 
 interface ItchGame {
   title: string
@@ -70,46 +71,7 @@ export function useItchGames() {
   useEffect(() => {
     async function loadItchGames() {
       try {
-        // Try to load the JSON data first
-        const jsonResponse = await fetch('/Portfolio/itch-games.json')
-        if (jsonResponse.ok) {
-          const data = await jsonResponse.json()
-          setItchGames(data.games || [])
-          return
-        }
-
-        // Fallback to parsing HTML if JSON is not available
-        const response = await fetch('/Portfolio/itch-games.html')
-        if (!response.ok) {
-          throw new Error('Failed to load Itch.io games')
-        }
-        
-        const html = await response.text()
-        const parser = new DOMParser()
-        const doc = parser.parseFromString(html, 'text/html')
-        
-        // Extract game data from the HTML
-        const gameCards = doc.querySelectorAll('.game-card')
-        const games: ItchGame[] = []
-        
-        gameCards.forEach(card => {
-          const titleElement = card.querySelector('h3')
-          const descElement = card.querySelector('p')
-          const linkElement = card.querySelector('a[href*="itch.io"]')
-          const imgElement = card.querySelector('img')
-          
-          if (titleElement && descElement && linkElement) {
-            games.push({
-              title: titleElement.textContent || '',
-              short_text: descElement.textContent || '',
-              cover_url: imgElement?.getAttribute('src') || '/placeholder.svg',
-              url: linkElement.getAttribute('href') || '',
-              published_at: new Date().toISOString() // Fallback date
-            })
-          }
-        })
-        
-        setItchGames(games)
+        setItchGames(await loadCatalog())
       } catch (err) {
         console.warn('Could not load Itch.io games:', err)
         setError('Failed to load games')

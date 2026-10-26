@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation"
 import { Menu, Code, Gamepad2, User, Mail, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { LanguageToggle } from "@/components/language-toggle"
+import { publicAsset } from "@/lib/public-path.mjs"
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
@@ -103,7 +103,7 @@ export function Navigation() {
                 asChild
               >
                 <a
-                  href="/Portfolio/Eric-Zaleta-Unity-Developer-Resume.pdf"
+                  href={publicAsset("/Eric-Zaleta-Unity-Developer-Resume.pdf")}
                   download="Eric-Zaleta-Unity-Developer-Resume.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -113,7 +113,6 @@ export function Navigation() {
                   <span className="lg:hidden">CV</span>
                 </a>
               </Button>
-              <LanguageToggle className="static h-8" />
             </div>
 
             {/* Mobile Menu Button - Only visible on mobile */}
@@ -173,7 +172,7 @@ export function Navigation() {
                     </Button>
                     <Button className="w-full bg-[#7EE787] text-[#0e0e10] hover:bg-[#7EE787]/90" asChild>
                       <a
-                        href="/Portfolio/Eric-Zaleta-Unity-Developer-Resume.pdf"
+                        href={publicAsset("/Eric-Zaleta-Unity-Developer-Resume.pdf")}
                         download="Eric-Zaleta-Unity-Developer-Resume.pdf"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -182,9 +181,6 @@ export function Navigation() {
                         Download Resume
                       </a>
                     </Button>
-                    <div className="w-full">
-                      <LanguageToggle className="static w-full" />
-                    </div>
                   </div>
                 </div>
               </SheetContent>
