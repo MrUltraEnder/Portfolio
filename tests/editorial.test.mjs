@@ -67,9 +67,10 @@ test('loading, errors, empty catalogs and unmatched searches remain distinct', (
 
 test('project switching synchronizes screenshot, caption, link and pressed state', async () => {
   const { window } = parseHTML('<html><body><div id="root"></div></body></html>')
-  const previous = Object.fromEntries(['window', 'document', 'IS_REACT_ACT_ENVIRONMENT'].map(key => [key, globalThis[key]]))
+  const previous = Object.fromEntries(['window', 'document', 'navigator', 'IS_REACT_ACT_ENVIRONMENT'].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]))
   globalThis.window = window
   globalThis.document = window.document
+  Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { userAgent: 'node' } })
   globalThis.IS_REACT_ACT_ENVIRONMENT = true
   window.matchMedia = () => ({ matches: true })
   const { createRoot } = await import('react-dom/client')
@@ -97,9 +98,9 @@ test('project switching synchronizes screenshot, caption, link and pressed state
     assert.equal(doc.querySelector('[data-project-title]').textContent, 'BubbleWare')
   } finally {
     await React.act(async () => root.unmount())
-    for (const [key, value] of Object.entries(previous)) {
-      if (value === undefined) delete globalThis[key]
-      else globalThis[key] = value
+    for (const [key, descriptor] of Object.entries(previous)) {
+      if (descriptor === undefined) delete globalThis[key]
+      else Object.defineProperty(globalThis, key, descriptor)
     }
   }
 })
