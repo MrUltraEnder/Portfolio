@@ -23,6 +23,7 @@ function loadPortfolio(hook) {
     if (id === '@/hooks/use-itch-games') return { useItchGames: () => hook }
     if (id === '@/lib/public-path.mjs') return { publicAsset }
     if (id === '@/lib/editorial-motion.mjs') return { animatePortfolio }
+    if (id === '@/components/ui/skeleton') return { Skeleton: props => React.createElement('div', props) }
     if (id === 'next/font/local') return { __esModule: true, default: () => ({ variable: 'font-variable' }) }
     if (id === 'next/link') return { __esModule: true, default: ({ children, ...props }) => React.createElement('a', props, children) }
     if (id.endsWith('.module.css')) return { __esModule: true, default: new Proxy({}, { get: (_, key) => key }) }
@@ -102,6 +103,26 @@ test('loading, errors, empty catalogs and unmatched searches remain distinct', (
   assert.match(render({ convertToProjects: () => [], searchTerm: 'missing' }).querySelector('[role="status"]').textContent, /No projects match/)
 })
 
+test('catalog loading has accessible, non-interactive project and index skeletons', () => {
+  const doc = render({ loading: true, convertToProjects: () => [] })
+  const skeleton = doc.querySelector('[data-project-skeleton]')
+  assert.ok(skeleton)
+  assert.equal(skeleton.getAttribute('role'), 'status')
+  assert.equal(skeleton.getAttribute('aria-busy'), 'true')
+  assert.match(skeleton.textContent, /Loading projects from Itch.io/)
+  assert.ok(skeleton.querySelector('[aria-hidden="true"] .skeletonImage'))
+  assert.equal(doc.querySelectorAll('[data-index-skeleton] li').length, 6)
+  assert.equal(doc.querySelector('[data-index-skeleton]').getAttribute('aria-hidden'), 'true')
+  assert.ok(doc.querySelector('#project-search').hasAttribute('disabled'))
+  assert.equal(doc.querySelector('[data-project-choice]'), null)
+  for (const state of [{}, { error: 'Failed' }, { convertToProjects: () => [] }]) {
+    const settled = render(state)
+    assert.equal(settled.querySelector('[data-project-skeleton]'), null)
+    assert.equal(settled.querySelector('[data-index-skeleton]'), null)
+    assert.equal(settled.querySelector('#project-search').hasAttribute('disabled'), false)
+  }
+})
+
 test('project switching synchronizes screenshot, caption, link and pressed state', async () => {
   const { window } = parseHTML('<html><body><div id="root"></div></body></html>')
   const previous = Object.fromEntries(['window', 'document', 'navigator', 'IS_REACT_ACT_ENVIRONMENT'].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]))
@@ -113,9 +134,16 @@ test('project switching synchronizes screenshot, caption, link and pressed state
   const { createRoot } = await import('react-dom/client')
   const root = createRoot(window.document.getElementById('root'))
   try {
-    const Component = loadPortfolio(fixture())
+    const hook = fixture({ loading: true, convertToProjects: () => [] })
+    const Component = loadPortfolio(hook)
     await React.act(async () => root.render(React.createElement(Component)))
     const doc = window.document
+    assert.ok(doc.querySelector('[data-project-skeleton]'))
+    Object.assign(hook, { loading: false, convertToProjects: () => games })
+    await React.act(async () => root.render(React.createElement(Component)))
+    assert.equal(doc.querySelector('[data-project-skeleton]'), null)
+    assert.equal(doc.querySelector('[data-index-skeleton]'), null)
+    assert.equal(doc.querySelector('#project-search').hasAttribute('disabled'), false)
     const choices = [...doc.querySelectorAll('[data-project-choice]')]
     const target = choices.find(button => button.textContent.includes('Orrery Ready'))
     await React.act(async () => target.dispatchEvent(new window.Event('click', { bubbles: true })))

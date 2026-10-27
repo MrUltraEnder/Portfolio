@@ -7,6 +7,7 @@ import { ArrowDown, ArrowUpRight, Download } from "lucide-react"
 import { useItchGames, type Project } from "@/hooks/use-itch-games"
 import { publicAsset } from "@/lib/public-path.mjs"
 import { animatePortfolio } from "@/lib/editorial-motion.mjs"
+import { Skeleton } from "@/components/ui/skeleton"
 import styles from "./editorial-portfolio.module.css"
 
 const display = localFont({ src: "../public/fonts/syne.woff2", variable: "--editorial-display", weight: "700 800", display: "swap" })
@@ -116,7 +117,27 @@ export default function EditorialPortfolio() {
             </div>}
           </div>
 
-          {loading ? <p className={styles.status} role="status">Loading projects from Itch.io...</p>
+          {loading ? <div role="status" aria-busy="true" data-project-skeleton>
+            <span className="sr-only">Loading projects from Itch.io...</span>
+            <div aria-hidden="true">
+              <Skeleton className={`${styles.projectFrame} ${styles.skeleton} ${styles.skeletonImage}`} />
+              <div className={styles.caption}>
+                <div>
+                  <Skeleton className={`${styles.skeleton} ${styles.skeletonTitle}`} />
+                  <Skeleton className={`${styles.skeleton} ${styles.skeletonLine} ${styles.skeletonShort}`} />
+                </div>
+                <div>
+                  <Skeleton className={`${styles.skeleton} ${styles.skeletonLine}`} />
+                  <Skeleton className={`${styles.skeleton} ${styles.skeletonLine}`} />
+                  <Skeleton className={`${styles.skeleton} ${styles.skeletonLine} ${styles.skeletonShort}`} />
+                </div>
+              </div>
+              <div className={styles.detail}>
+                <Skeleton className={`${styles.skeleton} ${styles.skeletonImage}`} />
+                <Skeleton className={`${styles.skeleton} ${styles.skeletonLine}`} />
+              </div>
+            </div>
+          </div>
             : error ? <div className={styles.status} role="status"><h3>Projects are temporarily unavailable</h3><p>Please try again later, <a href="https://grimoire-games.itch.io" target="_blank" rel="noopener noreferrer">visit Itch.io</a>, or contact me for project details.</p></div>
             : selected ? <article id="selected-project" className={styles.selectedProject}>
               <div className={styles.projectFrame} data-media={selectedArt ? "gameplay" : "cover"} style={selectedArt ? { maxWidth: selectedArt.width } : undefined}>
@@ -131,9 +152,11 @@ export default function EditorialPortfolio() {
 
           <div className={styles.indexHeader}>
             <h3>Project index</h3>
-            <div className={styles.search}><label htmlFor="project-search">Find a project</label><input id="project-search" type="search" placeholder="Title or description" value={searchTerm} onChange={event => { pendingAnimation.current = false; setSearchTerm(event.target.value) }} />{searchTerm && <button type="button" onClick={() => setSearchTerm("")}>Clear search</button>}</div>
+            <div className={styles.search}><label htmlFor="project-search">Find a project</label><input id="project-search" type="search" placeholder="Title or description" value={searchTerm} disabled={loading} onChange={event => { pendingAnimation.current = false; setSearchTerm(event.target.value) }} />{searchTerm && <button type="button" onClick={() => setSearchTerm("")}>Clear search</button>}</div>
           </div>
-          {!loading && !error && <ul className={styles.projectIndex} aria-label="All published projects">
+          {loading ? <ul className={styles.projectIndex} aria-hidden="true" data-index-skeleton>
+            {Array.from({ length: 6 }, (_, index) => <li key={index}><Skeleton className={`${styles.skeleton} ${styles.skeletonRow}`} /></li>)}
+          </ul> : !error && <ul className={styles.projectIndex} aria-label="All published projects">
             {projects.map(project => <li key={project.url ?? project.name}>
               <button type="button" data-project-choice aria-pressed={selected === project} aria-controls="selected-project" onClick={event => chooseProject(project, event)}><span>{project.name}</span><span className={styles.platform}>{project.platform && project.platform !== "Unknown" ? project.platform : "Itch.io"}</span></button>
               {project.url && <a href={project.url} target="_blank" rel="noopener noreferrer" aria-label={`Open ${project.name} on Itch.io`}><ArrowUpRight aria-hidden="true" /></a>}
