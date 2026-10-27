@@ -1,19 +1,20 @@
 "use client"
 
-import { useRef, useState, type MouseEvent } from "react"
+import { useEffect, useRef, useState, type MouseEvent } from "react"
 import Link from "next/link"
 import localFont from "next/font/local"
 import { ArrowDown, ArrowUpRight, Download } from "lucide-react"
 import { useItchGames, type Project } from "@/hooks/use-itch-games"
 import { publicAsset } from "@/lib/public-path.mjs"
+import { animatePortfolio } from "@/lib/editorial-motion.mjs"
 import styles from "./editorial-portfolio.module.css"
 
 const display = localFont({ src: "../public/fonts/syne.woff2", variable: "--editorial-display", weight: "700 800", display: "swap" })
 const body = localFont({ src: "../public/fonts/epilogue.woff2", variable: "--editorial-body", weight: "400 700", display: "swap" })
 
-const artwork: Record<string, { main: string; detail: string; alt: string; detailAlt: string }> = {
-  "https://tboxfinn.itch.io/bubbleware": { main: "bubble-world", detail: "bubble-play", alt: "BubbleWare soda minigame gameplay", detailAlt: "BubbleWare food minigame gameplay" },
-  "https://grimoirestudios.itch.io/orreryready": { main: "orrery-world", detail: "orrery-detail", alt: "Orrery Ready room with a suspended planet", detailAlt: "Orrery Ready interactive object" },
+const artwork: Record<string, { main: string; detail: string; width: number; height: number; detailWidth: number; detailHeight: number; alt: string; detailAlt: string }> = {
+  "https://tboxfinn.itch.io/bubbleware": { main: "bubble-world", detail: "bubble-play", width: 1920, height: 1080, detailWidth: 1920, detailHeight: 1080, alt: "BubbleWare soda minigame gameplay", detailAlt: "BubbleWare food minigame gameplay" },
+  "https://grimoirestudios.itch.io/orreryready": { main: "orrery-world", detail: "orrery-detail", width: 950, height: 593, detailWidth: 948, detailHeight: 590, alt: "Orrery Ready room with a suspended planet", detailAlt: "Orrery Ready interactive object" },
 }
 
 const experience = [
@@ -31,12 +32,27 @@ const skills = [
   { name: "Leadership & process", items: ["Team Leadership", "Agile", "Code Review", "Mentoring"] },
 ]
 
+function responsiveImage(name: string, width: number, height: number, sizes: string) {
+  const candidates = [640, 1280, width].filter((value, index, values) => value <= width && values.indexOf(value) === index).sort((a, b) => a - b)
+  return {
+    src: publicAsset(`/images/projects/${name}.webp`), width, height, sizes,
+    srcSet: candidates.map(value => `${publicAsset(`/images/projects/${name}${value === width ? "" : `-${value}`}.webp`)} ${value}w`).join(", "),
+  }
+}
+
 function projectImage(project: Project) {
   const art = artwork[project.url ?? ""]
-  return { src: art ? publicAsset(`/images/projects/${art.main}.webp`) : project.video || publicAsset("/placeholder.svg"), alt: art?.alt ?? `${project.name} project artwork` }
+  const maxWidth = Math.min(art?.width ?? 1280, 1280)
+  return art
+    ? { ...responsiveImage(art.main, art.width, art.height, `(max-width: 520px) calc(100vw - 44px), (max-width: ${maxWidth + 48}px) calc(100vw - 48px), ${maxWidth}px`), alt: art.alt }
+    : { src: project.video || publicAsset("/placeholder.svg"), alt: `${project.name} project artwork` }
 }
 
 export default function EditorialPortfolio() {
+  const portfolio = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (portfolio.current) return animatePortfolio(portfolio.current)
+  }, [])
   const { convertToProjects, loading, error, searchTerm, setSearchTerm } = useItchGames()
   const projects = convertToProjects("unity")
   const [selectedUrl, setSelectedUrl] = useState("https://tboxfinn.itch.io/bubbleware")
@@ -44,6 +60,7 @@ export default function EditorialPortfolio() {
   const mainImage = useRef<HTMLImageElement>(null)
   const pendingAnimation = useRef(false)
   const selectedArt = selected && artwork[selected.url ?? ""]
+  const selectedImage = selected ? projectImage(selected) : null
   const featured = projects.filter(project => artwork[project.url ?? ""])
 
   function chooseProject(project: Project, event: MouseEvent<HTMLButtonElement>) {
@@ -59,11 +76,11 @@ export default function EditorialPortfolio() {
     pendingAnimation.current = false
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !img.animate) return
     img.getAnimations().forEach(animation => animation.cancel())
-    img.animate([{ opacity: 0.55, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)" }], { duration: 260, easing: "cubic-bezier(.23,1,.32,1)" })
+    img.animate([{ opacity: 0.65, transform: "scale(1.025)", clipPath: "inset(0 8% 0 0)" }, { opacity: 1, transform: "scale(1)", clipPath: "inset(0)" }], { duration: 280, easing: "cubic-bezier(.23,1,.32,1)" })
   }
 
   return (
-    <div className={`${styles.portfolio} ${display.variable} ${body.variable}`}>
+    <div ref={portfolio} className={`${styles.portfolio} ${display.variable} ${body.variable}`}>
       <a className={styles.skip} href="#main-content">Skip to main content</a>
       <header className={styles.header}>
         <Link href="/" className={styles.brand}>Eric Zaleta</Link>
@@ -78,9 +95,11 @@ export default function EditorialPortfolio() {
       <main id="main-content" tabIndex={-1}>
         <section className={styles.hero} aria-labelledby="portfolio-title">
           <div className={styles.typeStage}>
-            <h1 id="portfolio-title"><span>Unity</span><span>developer.</span></h1>
+            <h1 id="portfolio-title" aria-label="Unity developer."><span data-motion="type" data-motion-intro aria-hidden="true">Unity</span><span aria-hidden="true">{"developer.".split("").map((letter, index) => <span className={styles.letter} data-motion="letter" data-motion-intro key={index}>{letter}</span>)}</span></h1>
             <figure className={styles.typeWindow} aria-label="A glimpse of BubbleWare gameplay">
-              <img src={publicAsset("/images/projects/bubble-world.webp")} alt="BubbleWare soda minigame" width={960} height={540} fetchPriority="high" />
+              {[0, 1, 2].map(slice => <span className={styles.imageSlice} data-motion="slice" data-motion-intro key={slice} aria-hidden={slice > 0 ? true : undefined}>
+                <img {...responsiveImage("bubble-world", 1920, 1080, "(max-width: 1328px) 42vw, 538px")} alt={slice === 0 ? "BubbleWare soda minigame" : ""} fetchPriority="high" />
+              </span>)}
             </figure>
           </div>
           <div className={styles.intro}>
@@ -100,14 +119,14 @@ export default function EditorialPortfolio() {
           {loading ? <p className={styles.status} role="status">Loading projects from Itch.io...</p>
             : error ? <div className={styles.status} role="status"><h3>Projects are temporarily unavailable</h3><p>Please try again later, <a href="https://grimoire-games.itch.io" target="_blank" rel="noopener noreferrer">visit Itch.io</a>, or contact me for project details.</p></div>
             : selected ? <article id="selected-project" className={styles.selectedProject}>
-              <div className={styles.projectFrame}>
-                <img ref={mainImage} data-project-image src={projectImage(selected).src} alt={projectImage(selected).alt} width={960} height={540} onLoad={revealImage} onError={event => { const fallback = publicAsset("/placeholder.svg"); if (event.currentTarget.getAttribute("src") !== fallback) event.currentTarget.src = fallback }} />
+              <div className={styles.projectFrame} data-media={selectedArt ? "gameplay" : "cover"} style={selectedArt ? { maxWidth: selectedArt.width } : undefined}>
+                <img ref={mainImage} data-project-image {...selectedImage} alt={selectedImage?.alt} onLoad={revealImage} onError={event => { const img = event.currentTarget; const fallback = publicAsset("/placeholder.svg"); img.removeAttribute("srcset"); img.removeAttribute("sizes"); if (img.getAttribute("src") !== fallback) img.src = fallback }} />
               </div>
               <div className={styles.caption} aria-live="polite" aria-atomic="true">
                 <div><h3 data-project-title>{selected.name}</h3><p>{selected.platform && selected.platform !== "Unknown" ? selected.platform : "Itch.io"} <span aria-hidden="true">/</span> {selected.metrics.published}</p></div>
                 <div><p>{selected.description}</p>{selected.url && <a data-project-link href={selected.url} target="_blank" rel="noopener noreferrer">Explore {selected.name} <ArrowUpRight aria-hidden="true" /></a>}</div>
               </div>
-              {selectedArt && <figure className={styles.detail}><img src={publicAsset(`/images/projects/${selectedArt.detail}.webp`)} alt={selectedArt.detailAlt} width={960} height={540} loading="lazy" /><figcaption>Another moment in {selected.name}.</figcaption></figure>}
+              {selectedArt && <figure className={styles.detail}><img {...responsiveImage(selectedArt.detail, selectedArt.detailWidth, selectedArt.detailHeight, "(max-width: 520px) 60vw, (max-width: 800px) 35vw, 400px")} alt={selectedArt.detailAlt} loading="lazy" /><figcaption>Another moment in {selected.name}.</figcaption></figure>}
             </article> : <p className={styles.status} role="status">{searchTerm ? "No projects match your search. Try another title or clear the search." : "No published projects yet. Published games from Itch.io will appear here."}</p>}
 
           <div className={styles.indexHeader}>
@@ -123,13 +142,13 @@ export default function EditorialPortfolio() {
         </section>
 
         <section id="about" className={styles.about} aria-labelledby="about-title">
-          <h2 id="about-title">Game roots.<br />Wider horizons.</h2>
+          <h2 id="about-title" data-motion="type">Game roots.<br />Wider horizons.</h2>
           <div><p>I studied game development. Since 2020, I&apos;ve been building with Unity across games, VR/AR and interactive applications.</p><p>My work connects gameplay mechanics, performance optimization and scalable systems. I&apos;m interested in what happens when those skills meet a different kind of brief.</p></div>
         </section>
 
         <section id="experience" className={styles.experience} aria-labelledby="experience-title">
           <h2 id="experience-title">Experience</h2>
-          <div>{experience.map(job => <article className={styles.job} key={job.studio}>
+          <div>{experience.map(job => <article className={styles.job} key={job.studio} data-motion="row">
             <div><h3>{job.studio}</h3><p>{job.role}</p><p className={styles.dates}>{job.dates}</p></div><p>{job.highlights}</p>
           </article>)}</div>
         </section>
@@ -140,7 +159,7 @@ export default function EditorialPortfolio() {
         </section>
 
         <section id="contact" className={styles.contact} aria-labelledby="contact-title">
-          <h2 id="contact-title">Let&apos;s build<br />what&apos;s next.</h2>
+          <h2 id="contact-title" data-motion="type">Let&apos;s build<br />what&apos;s next.</h2>
           <div><p>A game, an application, an experience.<br />Tell me what you&apos;re working on.</p><a className={styles.email} href="mailto:ericzaleta@gmail.com">ericzaleta@gmail.com <ArrowUpRight aria-hidden="true" /></a>
             <div className={styles.contactLinks}><a href="https://linkedin.com/in/ericzaleta" target="_blank" rel="noopener noreferrer">LinkedIn</a><a href="https://grimoire-games.itch.io" target="_blank" rel="noopener noreferrer">Itch.io</a><a href="tel:+524811124012">+52 481 112 4012</a></div>
           </div>

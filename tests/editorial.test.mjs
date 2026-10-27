@@ -8,10 +8,12 @@ import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import ts from 'typescript'
 import { publicAsset } from '../lib/public-path.mjs'
+import { animatePortfolio } from '../lib/editorial-motion.mjs'
 
 const require = createRequire(import.meta.url)
 const game = (name, url) => ({ name, url, video: 'https://example.com/cover.png', description: `${name} description`, metrics: { published: 'Jan 2025' }, platform: 'Windows' })
 const games = [game('BubbleWare', 'https://tboxfinn.itch.io/bubbleware'), game('Orrery Ready', 'https://grimoirestudios.itch.io/orreryready')]
+const imageCandidates = image => image.getAttribute('srcset') ?? image.getAttribute('srcSet')
 
 function loadPortfolio(hook) {
   const source = readFileSync(new URL('../components/editorial-portfolio.tsx', import.meta.url), 'utf8')
@@ -20,6 +22,7 @@ function loadPortfolio(hook) {
   vm.runInNewContext(outputText, { module: compiledModule, exports: compiledModule.exports, window: globalThis.window, require: id => {
     if (id === '@/hooks/use-itch-games') return { useItchGames: () => hook }
     if (id === '@/lib/public-path.mjs') return { publicAsset }
+    if (id === '@/lib/editorial-motion.mjs') return { animatePortfolio }
     if (id === 'next/font/local') return { __esModule: true, default: () => ({ variable: 'font-variable' }) }
     if (id === 'next/link') return { __esModule: true, default: ({ children, ...props }) => React.createElement('a', props, children) }
     if (id.endsWith('.module.css')) return { __esModule: true, default: new Proxy({}, { get: (_, key) => key }) }
@@ -41,6 +44,9 @@ test('editorial portfolio retains recruiter content, real destinations and ancho
   const doc = render()
   assert.match(doc.querySelector('h1').textContent, /Unity\s*developer\./)
   assert.equal(doc.querySelectorAll('h1').length, 1)
+  assert.equal(doc.querySelector('h1').getAttribute('aria-label'), 'Unity developer.')
+  assert.equal(doc.querySelectorAll('[data-motion="slice"]').length, 3)
+  assert.equal(doc.querySelectorAll('[data-motion="letter"]').length, 10)
   for (const id of ['main-content', 'about', 'projects', 'experience', 'skills', 'contact']) assert.ok(doc.getElementById(id), id)
   for (const text of ['Eric Zaleta', 'interactive applications', 'Inmersys', 'FUSE People & Technology', 'Grimoire Games']) assert.ok(doc.body.textContent.includes(text) || doc.textContent.includes(text), text)
   const links = [...doc.querySelectorAll('a')].map(a => a.getAttribute('href'))
@@ -56,6 +62,37 @@ test('catalog data, not prototype-only fixtures, controls the project index', ()
   assert.equal(doc.querySelector('[data-project-title]').textContent, custom.name)
   assert.equal(doc.querySelector('[data-project-link]').getAttribute('href'), custom.url)
   assert.ok(doc.querySelector('label[for="project-search"]'))
+  const image = doc.querySelector('[data-project-image]')
+  assert.equal(image.closest('[data-media]').getAttribute('data-media'), 'cover')
+  assert.equal(image.getAttribute('width'), null, 'unknown cover dimensions must not force enlargement')
+  assert.equal(image.getAttribute('height'), null)
+  assert.equal(image.getAttribute('srcset'), null, 'do not invent larger cover sources')
+})
+
+test('gameplay uses native dimensions and real responsive image candidates', () => {
+  const doc = render()
+  const image = doc.querySelector('[data-project-image]')
+  assert.equal(image.getAttribute('width'), '1920')
+  assert.equal(image.getAttribute('height'), '1080')
+  assert.match(imageCandidates(image), /bubble-world-640\.webp 640w/)
+  assert.match(imageCandidates(image), /bubble-world-1280\.webp 1280w/)
+  assert.match(imageCandidates(image), /bubble-world\.webp 1920w/)
+  for (const element of [...doc.querySelectorAll('img')].filter(imageCandidates)) {
+    assert.ok(element.getAttribute('sizes'))
+    for (const candidate of imageCandidates(element).split(', ')) {
+      const [src] = candidate.split(' ')
+      assert.ok(readFileSync(new URL(`../public${src}`, import.meta.url)).length > 0, src)
+    }
+  }
+})
+
+test('gameplay files preserve available native resolution without upsampling', () => {
+  for (const [name, width, height] of [['bubble-world', 1920, 1080], ['bubble-play', 1920, 1080], ['orrery-world', 950, 593], ['orrery-detail', 948, 590]]) {
+    const data = readFileSync(new URL(`../public/images/projects/${name}.webp`, import.meta.url))
+    assert.equal(data.toString('ascii', 12, 16), 'VP8 ')
+    assert.equal(data.readUInt16LE(26) & 0x3fff, width, name)
+    assert.equal(data.readUInt16LE(28) & 0x3fff, height, name)
+  }
 })
 
 test('loading, errors, empty catalogs and unmatched searches remain distinct', () => {
@@ -86,6 +123,10 @@ test('project switching synchronizes screenshot, caption, link and pressed state
     assert.equal(doc.querySelector('[data-project-title]').textContent, 'Orrery Ready')
     assert.match(doc.querySelector('[data-project-image]').getAttribute('src'), /orrery-world/)
     assert.match(doc.querySelector('[data-project-image]').alt, /Orrery Ready/)
+    assert.equal(doc.querySelector('[data-project-image]').getAttribute('width'), '950')
+    assert.equal(doc.querySelector('[data-project-image]').getAttribute('height'), '593')
+    assert.match(imageCandidates(doc.querySelector('[data-project-image]')), /orrery-world\.webp 950w/)
+    assert.equal(doc.querySelector('[data-media]').style.maxWidth, '950px')
     assert.equal(doc.querySelector('[data-project-link]').getAttribute('href'), games[1].url)
     let cancellations = 0
     const image = doc.querySelector('[data-project-image]')

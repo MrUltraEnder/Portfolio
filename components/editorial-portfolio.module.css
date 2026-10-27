@@ -36,10 +36,15 @@
 .hero { padding: 52px 0 0; }
 .typeStage { position: relative; container-type: inline-size; }
 .typeStage h1 { font-family: var(--editorial-display), sans-serif; font-weight: 800; letter-spacing: -.04em; line-height: .94; }
-.typeStage h1 span { display: block; }
-.typeStage h1 span:first-child { font-size: 12.8cqw; }
-.typeStage h1 span:last-child { font-size: 11.9cqw; }
-.typeWindow { position: absolute; right: 1%; top: 1.2cqw; width: 42%; height: 9cqw; transform: rotate(-2deg); overflow: clip; }
+.typeStage h1 > span { display: block; }
+.typeStage h1 > span:first-child { font-size: 12.8cqw; }
+.typeStage h1 > span:last-child { font-size: 11.9cqw; }
+.typeStage h1 .letter { display: inline-block; }
+.typeWindow { position: absolute; right: 1%; top: 1.2cqw; width: 42%; height: 9cqw; transform: rotate(-2deg); }
+.imageSlice { position: absolute; inset: 0; }
+.imageSlice:first-child { clip-path: inset(0 66.6% 0 0); }
+.imageSlice:nth-child(2) { clip-path: inset(0 33.3% 0 33.3%); }
+.imageSlice:last-child { clip-path: inset(0 0 0 66.6%); }
 .typeWindow img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 46%; }
 .intro { display: grid; grid-template-columns: 1.2fr .8fr; gap: 40px; align-items: end; margin-top: 40px; }
 .intro > p { max-width: 43ch; font-size: 19px; }
@@ -51,15 +56,17 @@
 .projectChoices { display: flex; gap: 8px; flex-wrap: wrap; }
 .projectChoices button { border: 0; background: transparent; color: var(--ink); font-size: 14px; min-height: 48px; padding: 12px 18px; }
 .projectChoices button[aria-pressed="true"] { background: var(--lilac); color: var(--canvas); }
-.projectFrame { transform: rotate(1deg); overflow: clip; background: var(--surface); }
-.projectFrame img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+.projectFrame { transform: rotate(1deg); overflow: clip; background: var(--surface); margin-inline: auto; }
+.projectFrame img { display: block; width: 100%; height: auto; }
+.projectFrame[data-media="cover"] { display: grid; place-items: center; min-height: clamp(260px, 35vw, 440px); padding: 24px; transform: none; }
+.projectFrame[data-media="cover"] img { width: auto; max-width: 100%; max-height: 390px; object-fit: contain; }
 .caption { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; margin-top: 42px; }
 .caption h3 { font-family: var(--editorial-display), sans-serif; font-size: clamp(28px, 3.7vw, 52px); font-weight: 700; line-height: 1.1; letter-spacing: -.035em; overflow-wrap: anywhere; }
 .caption p { max-width: 48ch; }
 .caption > div:first-child p { margin-top: 16px; color: var(--secondary-ink); font-size: 14px; }
 .caption a { display: inline-flex; align-items: center; gap: 12px; margin-top: 20px; text-decoration: underline; min-height: 44px; }
 .detail { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: end; margin: 36px 0 0 auto !important; width: 65%; }
-.detail img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+.detail img { width: 100%; height: auto; }
 .detail figcaption { font-size: 14px; color: var(--secondary-ink); max-width: 24ch; }
 .status { padding: 60px 24px; background: var(--surface); }
 .status h3 { font-size: 24px; line-height: 1.3; margin-bottom: 12px; }
@@ -103,11 +110,19 @@
 
 @media (hover: hover) and (pointer: fine) {
   .primary:hover { transform: translateY(-3px); }
+  .primary svg, .email svg, .caption a svg, .projectIndex a svg { transition: transform 180ms cubic-bezier(.23,1,.32,1); }
+  .primary:hover svg { transform: translateY(4px); }
+  .email:hover svg, .caption a:hover svg, .projectIndex a:hover svg { transform: translate(3px, -3px); }
+  .header nav a { position: relative; text-decoration: none; }
+  .header nav a::after { content: ""; position: absolute; inset: auto 0 5px; height: 2px; background: var(--lilac); transform: scaleX(0); transform-origin: right; transition: transform 220ms cubic-bezier(.23,1,.32,1); }
+  .header nav a:hover::after { transform: scaleX(1); transform-origin: left; }
+  .projectIndex button { transition: background-color 180ms ease; }
+  .portfolio :focus-visible, .portfolio :focus-visible svg { transition: none; }
   .projectChoices button:hover { text-decoration: underline; }
   .projectIndex :is(button, a):hover { background: var(--surface); }
 }
 
-@media (min-width: 1500px) { .typeStage h1 span:first-child { font-size: 164px; } .typeStage h1 span:last-child { font-size: 152px; } }
+@media (min-width: 1500px) { .typeStage h1 > span:first-child { font-size: 164px; } .typeStage h1 > span:last-child { font-size: 152px; } }
 @media (max-width: 800px) {
   .header { align-items: start; padding-top: 22px; }
   .header nav { gap: 10px 18px; flex-wrap: wrap; justify-content: end; font-size: 13px; }

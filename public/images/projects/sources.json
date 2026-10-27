@@ -1,25 +1,71 @@
 {
-  "note": "Original project screenshots, resized and encoded as WebP. No generated gameplay.",
+  "note": "Original project screenshots encoded at native resolution, with smaller responsive WebP variants. No upsampling or generated gameplay.",
   "images": [
     {
       "file": "bubble-play.webp",
       "source": "https://img.itch.zone/aW1hZ2UvMzI3Mjg3NS8xOTU1MjE0Ny5wbmc=/original/DYSU76.png",
-      "project": "https://tboxfinn.itch.io/bubbleware"
+      "project": "https://tboxfinn.itch.io/bubbleware",
+      "width": 1920,
+      "height": 1080,
+      "variants": [
+        {
+          "file": "bubble-play-640.webp",
+          "width": 640,
+          "height": 360
+        },
+        {
+          "file": "bubble-play-1280.webp",
+          "width": 1280,
+          "height": 720
+        }
+      ]
     },
     {
       "file": "bubble-world.webp",
       "source": "https://img.itch.zone/aW1hZ2UvMzI3Mjg3NS8xOTU1MjE4MS5wbmc=/original/g8CYwq.png",
-      "project": "https://tboxfinn.itch.io/bubbleware"
+      "project": "https://tboxfinn.itch.io/bubbleware",
+      "width": 1920,
+      "height": 1080,
+      "variants": [
+        {
+          "file": "bubble-world-640.webp",
+          "width": 640,
+          "height": 360
+        },
+        {
+          "file": "bubble-world-1280.webp",
+          "width": 1280,
+          "height": 720
+        }
+      ]
     },
     {
       "file": "orrery-world.webp",
       "source": "https://img.itch.zone/aW1hZ2UvMzAyMjU2MC8xODA3NDkxMC5wbmc=/original/sYvMFz.png",
-      "project": "https://grimoirestudios.itch.io/orreryready"
+      "project": "https://grimoirestudios.itch.io/orreryready",
+      "width": 950,
+      "height": 593,
+      "variants": [
+        {
+          "file": "orrery-world-640.webp",
+          "width": 640,
+          "height": 399
+        }
+      ]
     },
     {
       "file": "orrery-detail.webp",
       "source": "https://img.itch.zone/aW1hZ2UvMzAyMjU2MC8xODA3NDkzMS5wbmc=/original/jQs7WJ.png",
-      "project": "https://grimoirestudios.itch.io/orreryready"
+      "project": "https://grimoirestudios.itch.io/orreryready",
+      "width": 948,
+      "height": 590,
+      "variants": [
+        {
+          "file": "orrery-detail-640.webp",
+          "width": 640,
+          "height": 398
+        }
+      ]
     }
   ],
   "fonts": [
