@@ -186,6 +186,14 @@ html {
   scroll-behavior: smooth;
 }
 
+.accent-gradient {
+  background: linear-gradient(90deg, #89aacc 0%, #4e85bf 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
 /* Focus styles for accessibility */
 button:focus,
 a:focus {

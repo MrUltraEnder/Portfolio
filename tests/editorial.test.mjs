@@ -14,12 +14,20 @@ const require = createRequire(import.meta.url)
 const game = (name, url) => ({ name, url, video: 'https://example.com/cover.png', description: `${name} description`, metrics: { published: 'Jan 2025' }, platform: 'Windows' })
 const games = [game('BubbleWare', 'https://tboxfinn.itch.io/bubbleware'), game('Orrery Ready', 'https://grimoirestudios.itch.io/orreryready')]
 const imageCandidates = image => image.getAttribute('srcset') ?? image.getAttribute('srcSet')
+const mockMotion = new Proxy({}, {
+  get(target, tag) {
+    if (!target[tag]) target[tag] = React.forwardRef(({ children, initial, animate, exit, transition, whileInView, viewport, ...props }, ref) => React.createElement(tag, { ...props, ref }, children))
+    return target[tag]
+  },
+})
 
-function loadPortfolio(hook) {
+function loadPortfolio(hook, runtime = {}) {
   const source = readFileSync(new URL('../components/editorial-portfolio.tsx', import.meta.url), 'utf8')
   const { outputText } = ts.transpileModule(source, { compilerOptions: { jsx: ts.JsxEmit.ReactJSX, module: ts.ModuleKind.CommonJS, esModuleInterop: true } })
   const compiledModule = { exports: {} }
-  vm.runInNewContext(outputText, { module: compiledModule, exports: compiledModule.exports, window: globalThis.window, require: id => {
+  vm.runInNewContext(outputText, { module: compiledModule, exports: compiledModule.exports, window: globalThis.window, ...runtime.globals, require: id => {
+    if (runtime.modules?.[id]) return runtime.modules[id]
+    if (id === 'framer-motion') return { motion: mockMotion, AnimatePresence: ({ children }) => children, MotionConfig: ({ children }) => children, useReducedMotion: () => true }
     if (id === '@/hooks/use-itch-games') return { useItchGames: () => hook }
     if (id === '@/lib/public-path.mjs') return { publicAsset }
     if (id === '@/lib/editorial-motion.mjs') return { animatePortfolio }
@@ -43,11 +51,8 @@ function render(overrides) {
 
 test('editorial portfolio retains recruiter content, real destinations and anchors', () => {
   const doc = render()
-  assert.match(doc.querySelector('h1').textContent, /Unity\s*developer\./)
+  assert.equal(doc.querySelector('h1').textContent.trim(), 'Eric Zaleta')
   assert.equal(doc.querySelectorAll('h1').length, 1)
-  assert.equal(doc.querySelector('h1').getAttribute('aria-label'), 'Unity developer.')
-  assert.equal(doc.querySelectorAll('[data-motion="slice"]').length, 3)
-  assert.equal(doc.querySelectorAll('[data-motion="letter"]').length, 10)
   for (const id of ['main-content', 'about', 'projects', 'experience', 'skills', 'contact']) assert.ok(doc.getElementById(id), id)
   for (const text of ['Eric Zaleta', 'interactive applications', 'Inmersys', 'FUSE People & Technology', 'Grimoire Games']) assert.ok(doc.body.textContent.includes(text) || doc.textContent.includes(text), text)
   const links = [...doc.querySelectorAll('a')].map(a => a.getAttribute('href'))
@@ -125,7 +130,7 @@ test('catalog loading has accessible, non-interactive project and index skeleton
 
 test('project switching synchronizes screenshot, caption, link and pressed state', async () => {
   const { window } = parseHTML('<html><body><div id="root"></div></body></html>')
-  const previous = Object.fromEntries(['window', 'document', 'navigator', 'IS_REACT_ACT_ENVIRONMENT'].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]))
+  const previous = Object.fromEntries(['window', 'document', 'navigator', 'HTMLElement', 'IS_REACT_ACT_ENVIRONMENT'].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]))
   globalThis.window = window
   globalThis.document = window.document
   Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { userAgent: 'node' } })
@@ -156,6 +161,13 @@ test('project switching synchronizes screenshot, caption, link and pressed state
     assert.match(imageCandidates(doc.querySelector('[data-project-image]')), /orrery-world\.webp 950w/)
     assert.equal(doc.querySelector('[data-media]').style.maxWidth, '950px')
     assert.equal(doc.querySelector('[data-project-link]').getAttribute('href'), games[1].url)
+    const dialog = doc.querySelector('dialog')
+    await React.act(async () => doc.querySelector('[data-exploration-item]').dispatchEvent(new window.Event('click', { bubbles: true })))
+    assert.ok(dialog.hasAttribute('open'))
+    assert.equal(dialog.querySelector('img').alt, 'BubbleWare soda minigame gameplay')
+    await React.act(async () => dialog.querySelector('[aria-label="Close image"]').dispatchEvent(new window.Event('click', { bubbles: true })))
+    assert.equal(dialog.hasAttribute('open'), false)
+    assert.equal(dialog.querySelector('figure'), null)
     let cancellations = 0
     const image = doc.querySelector('[data-project-image]')
     image.getAnimations = () => [{ cancel: () => cancellations++ }]
@@ -172,4 +184,109 @@ test('project switching synchronizes screenshot, caption, link and pressed state
       else Object.defineProperty(globalThis, key, descriptor)
     }
   }
+})
+
+test('dark landing presents real portfolio content, media and navigation', () => {
+  const projects = [...games, game('Pacomixtle', 'https://grimoirestudios.itch.io/juego-ceart'), game('The adventures of Roby', 'https://tboxfinn.itch.io/the-adventures-of-roby')]
+  const doc = render({ convertToProjects: () => projects })
+
+  assert.equal(doc.querySelector('h1').textContent.trim(), 'Eric Zaleta')
+  for (const id of ['home', 'projects', 'journal', 'explorations', 'about', 'experience', 'skills', 'contact']) assert.ok(doc.getElementById(id), id)
+  assert.equal(doc.querySelectorAll('[data-featured-card]').length, 4)
+  assert.equal(doc.querySelectorAll('[data-journal-item]').length, 4)
+  assert.equal(doc.querySelector('#journal').getAttribute('aria-label'), 'Project archive')
+  assert.match(doc.querySelector('#journal h2').textContent, /From the archive/)
+  assert.equal(doc.querySelectorAll('[data-exploration-item]').length, 6)
+  const videos = [...doc.querySelectorAll('video')]
+  assert.equal(videos.length, 2)
+  for (const video of videos) for (const attribute of ['muted', 'loop', 'playsInline']) assert.ok(video.hasAttribute(attribute), attribute)
+  assert.ok(doc.querySelector('[aria-label="Loading portfolio"]'))
+  for (const text of ['BubbleWare', 'Orrery Ready', 'Pacomixtle', 'Grimoire Games']) assert.ok(doc.body.textContent.includes(text), text)
+  assert.doesNotMatch(doc.body.textContent, /Michael Smith|Automotive Motion|200% Satisfied Clients/)
+})
+
+
+test('loader completes and offscreen videos do not start after a late HLS import', async () => {
+  const { window } = parseHTML('<html><body><div id="root"></div></body></html>')
+  const keys = ['window', 'document', 'navigator', 'HTMLElement', 'IS_REACT_ACT_ENVIRONMENT']
+  const previous = Object.fromEntries(keys.map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]))
+  const proto = window.HTMLElement.prototype
+  const methods = Object.fromEntries(['canPlayType', 'play', 'pause'].map(key => [key, Object.getOwnPropertyDescriptor(proto, key)]))
+  let plays = 0
+  let attachments = 0
+  let destroyed = 0
+  let frame
+  const observers = []
+  class Observer {
+    constructor(callback) { this.callback = callback; observers.push(this) }
+    observe() { this.callback([{ isIntersecting: true }]); this.callback([{ isIntersecting: false }]) }
+    disconnect() {}
+  }
+  class Hls {
+    static isSupported() { return true }
+    loadSource() {}
+    attachMedia() { attachments++ }
+    destroy() { destroyed++ }
+  }
+  Object.assign(proto, { canPlayType: () => '', play: () => { plays++; return Promise.resolve() }, pause: () => {} })
+  globalThis.window = window
+  globalThis.document = window.document
+  globalThis.HTMLElement = window.HTMLElement
+  Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { userAgent: 'node' } })
+  globalThis.IS_REACT_ACT_ENVIRONMENT = true
+  window.matchMedia = () => ({ matches: false })
+  const { createRoot } = await import('react-dom/client')
+  const root = createRoot(window.document.getElementById('root'))
+  try {
+    const Component = loadPortfolio(fixture(), {
+      globals: { IntersectionObserver: Observer, performance: { now: () => 0 }, requestAnimationFrame: callback => { frame = callback; return 1 }, cancelAnimationFrame: () => {} },
+      modules: { 'hls.js': { __esModule: true, default: Hls } },
+    })
+    await React.act(async () => root.render(React.createElement(Component)))
+    const loader = window.document.querySelector('[aria-label="Loading portfolio"]')
+    assert.equal(loader.getAttribute('aria-valuenow'), '0')
+    await React.act(async () => frame(1350))
+    assert.equal(loader.getAttribute('aria-valuenow'), '50')
+    assert.ok(loader.textContent.includes('050'))
+    await React.act(async () => frame(2700))
+    assert.equal(loader.getAttribute('aria-valuenow'), '100')
+    await React.act(async () => new Promise(resolve => setTimeout(resolve, 450)))
+    assert.equal(window.document.querySelector('[aria-label="Loading portfolio"]'), null)
+    assert.equal(observers.length, 2)
+    assert.equal(plays, 0, 'the late import must not play a video that left the viewport')
+    assert.equal(attachments, 0, 'autoplay cannot start an offscreen attached video')
+    await React.act(async () => observers[0].callback([{ isIntersecting: true }]))
+    assert.equal(attachments, 1, 'the media is attached after re-entering the viewport')
+    assert.equal(plays, 1, 'the video can resume after re-entering the viewport')
+  } finally {
+    await React.act(async () => root.unmount())
+    assert.equal(destroyed, attachments)
+    for (const [key, descriptor] of Object.entries(methods)) {
+      if (descriptor === undefined) delete proto[key]
+      else Object.defineProperty(proto, key, descriptor)
+    }
+    for (const [key, descriptor] of Object.entries(previous)) {
+      if (descriptor === undefined) delete globalThis[key]
+      else Object.defineProperty(globalThis, key, descriptor)
+    }
+  }
+})
+
+
+test('portfolio body uses the Inter font already loaded by Next.js', () => {
+  const layout = readFileSync(new URL('../app/layout.tsx', import.meta.url), 'utf8')
+  const css = readFileSync(new URL('../components/editorial-portfolio.module.css', import.meta.url), 'utf8')
+  assert.match(layout, /Inter\(\{[^}]*variable:\s*["']--font-inter["']/)
+  assert.match(layout, /inter\.variable/)
+  assert.match(css, /--font-body:\s*var\(--font-inter\)/)
+})
+
+
+test('route entrances transition without motion for reduced-motion users', () => {
+  const template = readFileSync(new URL('../app/template.tsx', import.meta.url), 'utf8')
+  const css = readFileSync(new URL('../app/page-transition.module.css', import.meta.url), 'utf8')
+  assert.match(template, /className=\{styles\.pageTransition\}/)
+  assert.match(css, /@media\s*\(prefers-reduced-motion:\s*no-preference\)/)
+  assert.match(css, /animation:\s*page-enter/)
+  assert.match(css, /@keyframes\s+page-enter/)
 })

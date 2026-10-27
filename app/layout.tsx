@@ -4,7 +4,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
 export const metadata: Metadata = {
   title: "Eric Zaleta - Unity Developer & Game Designer",
@@ -32,7 +32,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#0e0e10" />
         <meta name="color-scheme" content="dark" />
       </head>
-      <body className={`${inter.className} antialiased`}>
+      <body className={`${inter.className} ${inter.variable} antialiased`}>
         {children}
         <Toaster />
       </body>

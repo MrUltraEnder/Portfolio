@@ -1,0 +1,8 @@
+@media (prefers-reduced-motion: no-preference) {
+  .pageTransition { animation: page-enter .35s ease-out both; }
+}
+
+@keyframes page-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
