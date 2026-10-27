@@ -88,7 +88,7 @@
 .cardCaption { position: absolute; inset: auto 0 0; display: flex; flex-direction: column; gap: 4px; padding: 50px 24px 22px; background: linear-gradient(transparent, rgba(0,0,0,.75)); }
 .cardCaption span { color: #d0d0d0; font-size: 11px; text-transform: uppercase; letter-spacing: .14em; }
 .cardCaption strong { font-size: 19px; font-weight: 500; }
-.cardHover { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(10,10,10,.7); opacity: 0; backdrop-filter: blur(12px); transition: opacity .3s ease; }
+.cardHover { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(10,10,10,.3); opacity: 0; backdrop-filter: blur(2px); transition: opacity .3s ease; }
 .projectCard:hover .cardHover, .projectCard:focus-visible .cardHover { opacity: 1; }
 .cardHover > span { display: flex; align-items: center; gap: 7px; padding: 13px 19px; border: 2px solid transparent; border-radius: 999px; background: linear-gradient(#f5f5f5,#f5f5f5) padding-box, linear-gradient(90deg,#89aacc,#4e85bf,#89aacc) border-box; background-size: 100% 100%, 200% 200%; color: #101010; font-size: 13px; animation: gradient-shift 6s ease infinite; }
 .cardHover em { font-size: 19px; }
@@ -149,7 +149,7 @@
 .galleryColumnLeft button:nth-child(odd) { transform: rotate(-5deg); }
 .galleryColumnRight button:nth-child(odd) { transform: rotate(5deg); }
 .galleryLayer button img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
-.galleryLayer button:hover img { transform: scale(1.06); }
+.galleryLayer button:hover img, .galleryLayer button:focus-visible img { transform: scale(1.06); }
 .lightbox { position: fixed; z-index: 100; width: min(90vw, 1000px); max-width: none; max-height: 90vh; margin: auto; padding: 24px; border: 1px solid #404040; border-radius: 20px; background: #111; color: #f5f5f5; }
 .lightbox::backdrop { background: rgba(0,0,0,.88); }
 .lightbox > button { display: grid; place-items: center; width: 44px; height: 44px; margin: 0 0 12px auto; border: 1px solid #444; border-radius: 50%; background: #202020; }
@@ -237,3 +237,12 @@
   .portfolio *, .portfolio *::before, .portfolio *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   .loader { display: none; }
 }
+
+@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .galleryColumnLeft { animation: gallery-rise 1s linear both; animation-timeline: view(); }
+    .galleryColumnRight { animation: gallery-fall 1s linear both; animation-timeline: view(); }
+  }
+}
+@keyframes gallery-rise { from { transform: translateY(6vh); } to { transform: translateY(-6vh); } }
+@keyframes gallery-fall { from { transform: translateY(-6vh); } to { transform: translateY(6vh); } }

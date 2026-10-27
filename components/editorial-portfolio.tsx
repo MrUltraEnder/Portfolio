@@ -108,25 +108,33 @@ function AmbientVideo({ inverted = false }: { inverted?: boolean }) {
     if (!video || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return
     let cancelled = false
     let started = false
+    let ready = false
     let visible = true
     let hls: { destroy: () => void } | undefined
+    const startNative = () => {
+      if (cancelled) return
+      if (!visible) { started = false; return }
+      hls?.destroy()
+      hls = undefined
+      if (!video.canPlayType("application/vnd.apple.mpegurl")) { started = false; return }
+      video.src = videoSource
+      ready = true
+      void video.play().catch(() => {})
+    }
     const start = () => {
-      if (started) { void video.play().catch(() => {}); return }
+      if (started) { if (ready) void video.play().catch(() => {}); return }
       started = true
-      if (video.canPlayType("application/vnd.apple.mpegurl")) {
-        video.src = videoSource
-        void video.play().catch(() => {})
-        return
-      }
       void import("hls.js").then(({ default: Hls }) => {
-        if (cancelled || !Hls.isSupported()) return
+        if (cancelled) return
         if (!visible) { started = false; return }
+        if (!Hls.isSupported()) { startNative(); return }
         const player = new Hls()
         hls = player
         player.loadSource(videoSource)
         player.attachMedia(video)
+        ready = true
         void video.play().catch(() => {})
-      }).catch(() => {})
+      }).catch(startNative)
     }
     const observer = typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver(entries => {
       visible = Boolean(entries[0]?.isIntersecting)
@@ -273,10 +281,10 @@ export default function EditorialPortfolio() {
 
         <section id="projects" className={`${styles.container} ${styles.work}`} aria-label="Selected work">
           <SectionHeading eyebrow="Selected work" title="Featured" italic="projects" description="A selection of games and interactive experiences, from concept to launch." action={{ href: "#project-index", label: "View all work" }} />
-          {!loading && !error && featuredCards.length > 0 && <div className={styles.bento}>{featuredCards.map(project => <button key={project.url ?? project.name} type="button" data-featured-card className={styles.projectCard} onClick={event => { chooseProject(project, event); document.getElementById("selected-project")?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" }) }}>
+          {!loading && !error && featuredCards.length > 0 && <div className={styles.bento}>{featuredCards.map((project, index) => <motion.button key={project.url ?? project.name} type="button" data-featured-card data-reveal className={styles.projectCard} initial={reducedMotion ? false : { opacity: 0.6, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.12 }} transition={{ duration: 0.7, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }} onClick={event => { chooseProject(project, event); document.getElementById("selected-project")?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" }) }}>
             <img {...projectImage(project)} alt="" loading="lazy" onError={handleImageError} />
             <span className={styles.halftone} aria-hidden="true" /><span className={styles.cardCaption}><span>{project.platform && project.platform !== "Unknown" ? project.platform : "Itch.io"}</span><strong>{project.name}</strong></span><span className={styles.cardHover}><span>View <span aria-hidden="true">—</span> <em>{project.name}</em> <ArrowUpRight aria-hidden="true" /></span></span>
-          </button>)}</div>}
+          </motion.button>)}</div>}
 
           {!loading && !error && featured.length > 0 && <div className={styles.projectChoices} aria-label="Featured project selection">{featured.map(project => <button type="button" key={project.url} aria-pressed={selected?.url === project.url} aria-controls="selected-project" data-project-choice onClick={event => chooseProject(project, event)}>{project.name}</button>)}</div>}
           {loading ? <div role="status" aria-busy="true" data-project-skeleton><span className="sr-only">Loading projects from Itch.io...</span><div aria-hidden="true"><Skeleton className={`${styles.projectFrame} ${styles.skeleton} ${styles.skeletonImage}`} /><div className={styles.caption}><div><Skeleton className={`${styles.skeleton} ${styles.skeletonTitle}`} /><Skeleton className={`${styles.skeleton} ${styles.skeletonLine} ${styles.skeletonShort}`} /></div><div><Skeleton className={`${styles.skeleton} ${styles.skeletonLine}`} /><Skeleton className={`${styles.skeleton} ${styles.skeletonLine}`} /><Skeleton className={`${styles.skeleton} ${styles.skeletonLine} ${styles.skeletonShort}`} /></div></div><div className={styles.detail}><Skeleton className={`${styles.skeleton} ${styles.skeletonImage}`} /><Skeleton className={`${styles.skeleton} ${styles.skeletonLine}`} /></div></div></div>

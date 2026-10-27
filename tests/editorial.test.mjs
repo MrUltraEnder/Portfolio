@@ -206,6 +206,94 @@ test('dark landing presents real portfolio content, media and navigation', () =>
 })
 
 
+async function inspectAmbientVideo({ supported = true, importFails = false, reducedMotion = false, reenterWhileLoading = false } = {}) {
+  const { window } = parseHTML('<html><body><div id="root"></div></body></html>')
+  const keys = ['window', 'document', 'navigator', 'HTMLElement', 'IS_REACT_ACT_ENVIRONMENT']
+  const previous = Object.fromEntries(keys.map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]))
+  const proto = window.HTMLElement.prototype
+  const methods = Object.fromEntries(['canPlayType', 'play', 'pause'].map(key => [key, Object.getOwnPropertyDescriptor(proto, key)]))
+  const players = []
+  let plays = 0
+  class Hls {
+    static isSupported() { return supported }
+    constructor() { this.destroyed = false; players.push(this) }
+    loadSource(source) { this.source = source }
+    attachMedia(video) { this.video = video }
+    destroy() { this.destroyed = true }
+  }
+  Object.assign(proto, { canPlayType: () => 'maybe', play: () => { plays++; return Promise.resolve() }, pause: () => {} })
+  globalThis.window = window
+  globalThis.document = window.document
+  globalThis.HTMLElement = window.HTMLElement
+  Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { userAgent: 'node' } })
+  globalThis.IS_REACT_ACT_ENVIRONMENT = true
+  window.matchMedia = () => ({ matches: reducedMotion })
+  const modules = { 'hls.js': { __esModule: true, default: Hls } }
+  if (importFails) Object.defineProperty(modules, 'hls.js', { get() { throw new Error('HLS chunk unavailable') } })
+  const { createRoot } = await import('react-dom/client')
+  const root = createRoot(window.document.getElementById('root'))
+  try {
+    class Observer {
+      constructor(callback) { this.callback = callback }
+      observe() {
+        this.callback([{ isIntersecting: true }])
+        this.callback([{ isIntersecting: false }])
+        this.callback([{ isIntersecting: true }])
+      }
+      disconnect() {}
+    }
+    const Component = loadPortfolio(fixture(), {
+      globals: { IntersectionObserver: reenterWhileLoading ? Observer : undefined, performance: { now: () => 0 }, requestAnimationFrame: () => 1, cancelAnimationFrame: () => {} },
+      modules,
+    })
+    await React.act(async () => root.render(React.createElement(Component)))
+    const videos = [...window.document.querySelectorAll('video')]
+    return { videos, players, plays }
+  } finally {
+    await React.act(async () => root.unmount())
+    for (const [key, descriptor] of Object.entries(methods)) {
+      if (descriptor === undefined) delete proto[key]
+      else Object.defineProperty(proto, key, descriptor)
+    }
+    for (const [key, descriptor] of Object.entries(previous)) {
+      if (descriptor === undefined) delete globalThis[key]
+      else Object.defineProperty(globalThis, key, descriptor)
+    }
+  }
+}
+
+test('ambient videos prefer hls.js when native HLS support is uncertain', async () => {
+  const { videos, players, plays } = await inspectAmbientVideo()
+  assert.equal(players.length, 2, 'both videos use hls.js even when native support reports maybe')
+  assert.equal(plays, 2)
+  for (const [index, player] of players.entries()) {
+    assert.equal(player.video, videos[index])
+    assert.match(player.source, /^https:\/\/stream\.mux\.com\/.+\.m3u8$/)
+    assert.ok(player.destroyed, 'the player is destroyed on unmount')
+    assert.ok(!videos[index].getAttribute('src'), 'native playback does not take precedence')
+  }
+})
+
+test('ambient videos wait for an HLS attachment when visibility changes during loading', async () => {
+  const { players, plays } = await inspectAmbientVideo({ reenterWhileLoading: true })
+  assert.equal(players.length, 2)
+  assert.equal(plays, 2, 're-entering before the import resolves does not play an unattached video')
+  assert.ok(players.every(player => player.destroyed))
+})
+
+test('ambient videos retain native HLS fallback and respect reduced motion', async () => {
+  for (const options of [{ supported: false }, { importFails: true }]) {
+    const { videos, players, plays } = await inspectAmbientVideo(options)
+    assert.equal(players.length, 0)
+    assert.equal(plays, 2)
+    for (const video of videos) assert.match(video.src, /^https:\/\/stream\.mux\.com\/.+\.m3u8$/)
+  }
+  const reduced = await inspectAmbientVideo({ reducedMotion: true })
+  assert.equal(reduced.players.length, 0)
+  assert.equal(reduced.plays, 0)
+  for (const video of reduced.videos) assert.ok(!video.getAttribute('src'))
+})
+
 test('loader completes and offscreen videos do not start after a late HLS import', async () => {
   const { window } = parseHTML('<html><body><div id="root"></div></body></html>')
   const keys = ['window', 'document', 'navigator', 'HTMLElement', 'IS_REACT_ACT_ENVIRONMENT']
@@ -289,4 +377,51 @@ test('route entrances transition without motion for reduced-motion users', () =>
   assert.match(css, /@media\s*\(prefers-reduced-motion:\s*no-preference\)/)
   assert.match(css, /animation:\s*page-enter/)
   assert.match(css, /@keyframes\s+page-enter/)
+})
+
+test('featured projects reveal on entry and respect reduced motion', () => {
+  for (const reduced of [false, true]) {
+    const seen = []
+    const motion = new Proxy({}, {
+      get: (_, tag) => React.forwardRef(({ children, initial, animate, exit, transition, whileInView, viewport, ...props }, ref) => {
+        if (tag === 'button' && 'data-featured-card' in props) seen.push({ initial, whileInView, viewport })
+        return React.createElement(tag, { ...props, ref }, children)
+      }),
+    })
+    const Component = loadPortfolio(fixture(), { modules: { 'framer-motion': {
+      motion, AnimatePresence: ({ children }) => children, MotionConfig: ({ children }) => children, useReducedMotion: () => reduced,
+    } } })
+    const doc = parseHTML(`<html><body>${renderToStaticMarkup(React.createElement(Component))}</body></html>`).document
+    assert.equal(doc.querySelectorAll('[data-featured-card]').length, games.length)
+    assert.equal(seen.length, games.length, 'each dynamically rendered card participates in the entry animation')
+    for (const card of seen) {
+      if (reduced) assert.equal(card.initial, false)
+      else {
+        assert.ok(card.initial.opacity > 0 && card.initial.opacity < 1)
+        assert.ok(card.initial.y > 0)
+      }
+      assert.equal(card.whileInView.opacity, 1)
+      assert.equal(card.whileInView.y, 0)
+      assert.equal(card.viewport.once, true)
+    }
+  }
+})
+
+test('hover treatment leaves project artwork visible during its zoom', () => {
+  const css = readFileSync(new URL('../components/editorial-portfolio.module.css', import.meta.url), 'utf8')
+  const overlay = css.match(/\.cardHover\s*\{([^}]+)\}/)?.[1] ?? ''
+  const opacity = Number(overlay.match(/background:\s*rgba\(\s*10\s*,\s*10\s*,\s*10\s*,\s*(\.\d+)\s*\)/)?.[1])
+  const blur = Number(overlay.match(/backdrop-filter:\s*blur\((\d+(?:\.\d+)?)px\)/)?.[1])
+  assert.ok(opacity > 0 && opacity <= 0.4, 'overlay must not obscure the image')
+  assert.ok(blur >= 0 && blur <= 2, 'blur must not hide the zoomed artwork')
+  assert.match(css, /\.projectCard:hover\s*>\s*img/)
+  assert.match(css, /\.projectCard:focus-visible\s*>\s*img/)
+})
+
+test('mobile gallery motion uses a scroll timeline only when motion is enabled', () => {
+  const css = readFileSync(new URL('../components/editorial-portfolio.module.css', import.meta.url), 'utf8')
+  assert.match(css, /@media\s*\(max-width:\s*767px\)\s*and\s*\(prefers-reduced-motion:\s*no-preference\)/)
+  assert.match(css, /@supports\s*\(animation-timeline:\s*view\(\)\)/)
+  assert.match(css, /\.galleryColumnLeft\s*\{[^}]*animation-timeline:\s*view\(\)/)
+  assert.match(css, /\.galleryColumnRight\s*\{[^}]*animation-timeline:\s*view\(\)/)
 })
